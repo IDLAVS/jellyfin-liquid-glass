@@ -1,7 +1,7 @@
 /*
  * Liquid Glass for Jellyfin 12.2
  * Load via Dashboard > General > Custom CSS:
- *   @import url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@main/liquid-glass-12.2.css");
+ *   @import url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.1.0/liquid-glass-12.2.css");
  *
  * Wallpaper is NOT part of this file. Add your own after the @import:
  *   :root { --custom-bg: url('https://cdn.jsdelivr.net/gh/<user>/<repo>@main/<image>.jpg'); }
@@ -120,7 +120,9 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
    4. Glass surfaces: header, drawer, cards, now playing bar
    ========================================================================== */
 .skinHeader,
+.MuiAppBar-root,
 .mainDrawer,
+.MuiDrawer-paper,
 .cardScalable,
 .nowPlayingBar {
   background: var(--lg-surface) !important;
@@ -131,15 +133,18 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
   color: var(--lg-text);
 }
 
-.skinHeader {
+.skinHeader,
+.MuiAppBar-root {
   border-width: 0 0 1px 0;
 }
 
-.skinHeader.semiTransparent {
+.skinHeader.semiTransparent,
+.MuiAppBar-root.MuiAppBar-colorTransparent {
   background: rgba(20, 20, 26, 0.4) !important;
 }
 
-.mainDrawer {
+.mainDrawer,
+.MuiDrawer-paper {
   border-width: 0 1px 0 0;
 }
 
