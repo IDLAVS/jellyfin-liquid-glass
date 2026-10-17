@@ -5,7 +5,7 @@
  *
  * Wallpaper is NOT part of this file. Add your own after the @import:
  *   :root { --custom-bg: url('https://cdn.jsdelivr.net/gh/<user>/<repo>@main/<image>.jpg'); }
- * Without it you get a plain dark background.
+ * (--bgImage is accepted too.) Without it, Jellyfin's default background shows.
  *
  * Layout rule: this file never changes display, position, flex-direction,
  * height or margins of .mainAnimatedPages, .page or .homeSectionsContainer,
@@ -74,32 +74,26 @@ html,
 body,
 .page,
 .view,
-.mainAnimatedPages,
-.backgroundContainer,
-.skinBody {
+.mainAnimatedPages {
   background: transparent !important;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-color: #0b0b0f;
-  background-image: var(--custom-bg, none);
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  pointer-events: none;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.2) 0%, rgba(10, 10, 14, 0.65) 100%);
-  pointer-events: none;
+/*
+ * Wallpaper. Jellyfin 12 paints its page background on .backgroundContainer, so
+ * the image goes there (not on body::before). Detail pages get Jellyfin's own
+ * backdrop: .withBackdrop is skipped on purpose.
+ * Reads --custom-bg, or --bgImage if you already have that set.
+ */
+.backgroundContainer:not(.withBackdrop),
+.defaultBackground,
+#loginPage {
+  background-image:
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0.2) 0%, rgba(10, 10, 14, 0.65) 100%),
+    var(--custom-bg, var(--bgImage, none)) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-attachment: fixed !important;
 }
 
 ::selection {
@@ -110,19 +104,16 @@ body::after {
 /* ==========================================================================
    3. Backdrop handling
    ========================================================================== */
-/* Home screen: no dynamic backdrop */
+/* Home screen: no dynamic backdrop layer */
 .homeSectionsContainer .backdropContainer {
   display: none !important;
 }
 
-body:has(.homePage:not(.hide)) .backdropContainer {
-  display: none !important;
-}
-
-/* Detail pages: keep the backdrop, softly masked */
+/* Detail pages: keep Jellyfin's backdrop, softly masked at the bottom */
+body:has(.itemDetailPage:not(.hide)) .backgroundContainer.withBackdrop,
 body:has(.itemDetailPage:not(.hide)) .backdropContainer {
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 55%, transparent 100%);
 }
 
 /* ==========================================================================

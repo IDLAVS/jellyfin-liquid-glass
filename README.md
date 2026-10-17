@@ -97,7 +97,7 @@ Override any variable in the same **Custom CSS** box. Put your overrides **after
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `--custom-bg` | not set (plain dark background) | Wallpaper image, rendered fixed and covering the viewport. Use `url('...')`. |
+| `--custom-bg` | not set (Jellyfin's default background) | Wallpaper image, rendered fixed and covering the viewport. Use `url('...')`. `--bgImage` is accepted as an alias. |
 | `--glass-blur` | `blur(24px) saturate(180%)` | The `backdrop-filter` applied to every glass surface. |
 | `--card-radius` | `16px` | Corner radius of cards, dialogs and panels. Buttons (12px) and pills (9999px) are fixed. |
 | `--apple-accent` | `#0a84ff` | Accent color for primary buttons, focus rings, progress bars and sliders. |
