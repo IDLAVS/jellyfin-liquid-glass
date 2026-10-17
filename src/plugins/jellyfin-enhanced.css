@@ -1,0 +1,65 @@
+/* ==========================================================================
+   PLUGIN · Jellyfin Enhanced  (n00bcodr/Jellyfin-Enhanced)
+   --------------------------------------------------------------------------
+   What the plugin does that matters for theming:
+
+   - #jellyfin-enhanced-panel is built in JS with INLINE styles: position:
+     fixed, top/left 50%, transform: translate(-50%,-50%), a fixed size,
+     background rgb(24,24,24), box-shadow, border, border-radius and
+     backdropFilter. Inline styles beat any selector, so the paint properties
+     below need !important. The positioning properties (position, top, left,
+     transform, width, height, z-index, display, overflow) are NEVER set here;
+     overriding transform in particular would un-centre the panel.
+   - Its header (.panel-header) and footer (.panel-footer) carry an inline
+     background taken from the plugin's own theme detection.
+   - On narrow screens the plugin turns .je-panel-main into a solid sheet
+     (background rgb(24,24,24)); that is left alone on purpose.
+   - Seerr / Arr links in .itemExternalLinks are .button-link.emby-button
+     anchors whose icons have inline pixel sizes; nothing here resizes them.
+
+   Collisions avoided: no theme variable shares a name with the plugin's
+   (--je-*, --arr-*), and nothing here targets its generated elements by tag.
+   ========================================================================== */
+
+#jellyfin-enhanced-panel,
+#je-active-streams-panel {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-card) !important;
+  box-shadow: var(--lg-specular), var(--lg-shadow-deep) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong) !important;
+  backdrop-filter: var(--lg-filter-strong) !important;
+  color: var(--lg-text);
+}
+
+#jellyfin-enhanced-panel .panel-header,
+#jellyfin-enhanced-panel .panel-footer {
+  background: rgb(255 255 255 / 0.04) !important;
+  border-color: var(--lg-border-color) !important;
+}
+
+/* Floating "active streams" widget and its cards */
+#je-active-streams-panel .je-as-card {
+  background: rgb(255 255 255 / 0.06);
+  border: var(--lg-border);
+  border-radius: var(--lg-button-radius);
+}
+
+/* Category re-order buttons inside the settings panel */
+#jellyfin-enhanced-panel .je-cat-btn {
+  border-radius: var(--lg-radius-pill);
+}
+
+/* Header buttons the plugin injects (random item, etc.). Colour and hover
+   only: no size, margin or border changes, so the header never shifts. */
+#randomItemButton {
+  border-radius: var(--lg-radius-pill);
+  color: var(--lg-text);
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #randomItemButton:hover:not(:disabled) {
+    background-color: var(--lg-hover);
+  }
+}

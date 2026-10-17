@@ -1,0 +1,47 @@
+/* ==========================================================================
+   02 · Backdrop handling (Jellyfin 12 detail-page transitions)
+   --------------------------------------------------------------------------
+   Jellyfin renders two fixed layers behind the UI:
+     .backgroundContainer   page colour; gains .withBackdrop on pages that show
+                            an item backdrop
+     .backdropContainer     holds the .backdropImage elements that fade in/out
+
+   The flash seen when moving between movie/show pages came from CSS that was
+   toggled with  body:has(.itemDetailPage:not(.hide))  (background-image, mask).
+   During a route change the old and new page both exist for a moment, so that
+   condition flipped true -> false -> true and the layers snapped.
+
+   Fix: nothing here depends on page state. The mask is permanent, and every
+   visual change that follows .withBackdrop is a cross-fade, never a snap.
+   ========================================================================== */
+
+:root {
+  --lg-backdrop-mask: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.6) 55%, transparent 100%);
+  --lg-backdrop-fade: 0.45s;
+}
+
+.backgroundContainer {
+  transition: background-color var(--lg-backdrop-fade) ease;
+}
+
+.backgroundContainer::before {
+  transition-duration: var(--lg-backdrop-fade);
+}
+
+/* Wallpaper hands over to the item backdrop instead of painting under it. */
+.backgroundContainer.withBackdrop::before {
+  opacity: 0;
+}
+
+.backdropContainer {
+  -webkit-mask-image: var(--lg-backdrop-mask);
+  mask-image: var(--lg-backdrop-mask);
+}
+
+/* Own compositor layer + explicit fade: keeps the cross-fade from repainting
+   (and flashing) when the mask or header glass recomposites above it. */
+.backdropImage {
+  transition: opacity var(--lg-backdrop-fade) ease;
+  backface-visibility: hidden;
+  will-change: opacity;
+}

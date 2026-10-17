@@ -1,0 +1,58 @@
+/* ==========================================================================
+   PLUGIN · Intro Skipper  (intro-skipper/intro-skipper)
+   --------------------------------------------------------------------------
+   Current Intro Skipper no longer injects its own button. It writes media
+   segments and Jellyfin's native player shows the skip control, which is
+   .skip-button inside .skip-button-container. Older plugin builds injected
+   #skipIntro / #skipCredits instead; those stay listed so they still match.
+
+   The control sits at the player's lower right and fades with the OSD. This
+   block only paints it as glass. It never sets position, bottom/right, margin,
+   or size, so wherever Jellyfin (or another CSS snippet) puts it is respected.
+
+   Clipping: the hover glow is a box-shadow, which any ancestor with
+   overflow: hidden would cut off. The container is made overflow: visible,
+   and the label can't wrap or be truncated.
+   ========================================================================== */
+
+.skip-button-container {
+  overflow: visible;
+}
+
+.skip-button,
+#skipIntro,
+#skipCredits {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-glass-shadow) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: #fff !important;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: visible;
+  transition:
+    background-color var(--lg-duration) var(--lg-ease),
+    border-color var(--lg-duration) var(--lg-ease),
+    box-shadow var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .skip-button:hover,
+  #skipIntro:hover,
+  #skipCredits:hover {
+    background: var(--lg-glass-bg-solid) !important;
+    border-color: var(--lg-border-color-strong) !important;
+    box-shadow: var(--lg-specular), var(--lg-glow) !important;
+  }
+}
+
+/* Remote / keyboard focus gets the same treatment. */
+.skip-button:focus-visible,
+#skipIntro:focus-visible,
+#skipCredits:focus-visible {
+  border-color: var(--lg-accent) !important;
+  box-shadow: var(--lg-specular), var(--lg-glow) !important;
+  outline: none;
+}

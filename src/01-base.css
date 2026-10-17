@@ -1,0 +1,143 @@
+/* ==========================================================================
+   01 · Base: palette bridge, typography, page layers, wallpaper, scrollbars
+   ========================================================================== */
+
+/* Jellyfin 12 builds its UI with MUI and exposes the palette as --jf-palette-*
+   custom properties. Setting those is far more stable than chasing the
+   generated (hashed) Emotion class names, which change between builds.
+   The double selector beats the generated :root[data-theme] block. */
+:root,
+:root[data-theme] {
+  color-scheme: dark;
+
+  --jf-palette-background-default: var(--lg-page-base);
+  --jf-palette-background-defaultChannel: 10 10 14;
+  --jf-palette-background-paper: var(--lg-glass-bg-strong);
+  --jf-palette-background-paperChannel: var(--lg-glass-tint);
+
+  --jf-palette-AppBar-defaultBg: transparent;
+  --jf-palette-AppBar-transparentBg: transparent;
+
+  --jf-palette-text-primary: var(--lg-text);
+  --jf-palette-text-primaryChannel: 255 255 255;
+  --jf-palette-text-secondary: var(--lg-text-dim);
+  --jf-palette-text-secondaryChannel: 255 255 255;
+  --jf-palette-common-white: #fff;
+  --jf-palette-common-whiteChannel: 255 255 255;
+
+  --jf-palette-primary-main: var(--lg-accent);
+  --jf-palette-primary-mainChannel: var(--lg-accent-rgb);
+  --jf-palette-primary-light: var(--lg-accent-light);
+  --jf-palette-primary-contrastText: #fff;
+  --jf-palette-secondary-main: var(--lg-accent);
+  --jf-palette-secondary-mainChannel: var(--lg-accent-rgb);
+
+  --jf-palette-divider: var(--lg-border-color);
+  --jf-palette-dividerChannel: 255 255 255;
+  --jf-palette-action-hover: var(--lg-hover);
+  --jf-palette-action-selected: var(--lg-active);
+  --jf-palette-action-focus: var(--lg-hover);
+  --jf-palette-action-active: var(--lg-text);
+
+  --jf-palette-FilledInput-bg: rgb(255 255 255 / 0.06);
+  --jf-palette-SnackbarContent-bg: var(--lg-glass-bg-strong);
+  --jf-palette-SnackbarContent-color: #fff;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--lg-font);
+}
+
+/* MUI components declare their own font; make them inherit. Icon fonts are
+   excluded so Material Icons keep rendering. */
+[class*="Mui"]:not(.MuiIcon-root) {
+  font-family: inherit;
+}
+
+html {
+  background: var(--lg-page-base);
+  color: var(--lg-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* The wallpaper lives on .backgroundContainer, so every layer above it has to
+   be see-through. These are the only layout-neutral rules the theme needs. */
+body,
+#reactRoot,
+.page,
+.view,
+.mainAnimatedPages,
+.mainAnimatedPage {
+  background: transparent !important;
+}
+
+::selection {
+  background: var(--lg-accent-soft);
+  color: #fff;
+}
+
+/* --- Wallpaper -------------------------------------------------------------
+   Painted on a pseudo-element so brightness and blur can be filtered without
+   dimming anything else. It fades out (rather than snapping) when Jellyfin
+   switches the page to a backdrop, see 02-backdrop.css. */
+.backgroundContainer::before {
+  content: "";
+  position: fixed;
+  inset: calc(var(--lg-wallpaper-blur) * -2);
+  z-index: -1;
+  background: var(--lg-wallpaper) center / cover no-repeat;
+  filter: brightness(var(--lg-wallpaper-brightness)) blur(var(--lg-wallpaper-blur));
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.45s ease;
+}
+
+/* --- Scrollbars ------------------------------------------------------------
+   Chromium 121+ and Firefox use the standard properties; the -webkit-
+   pseudo-elements are only a fallback for older WebKit/Blink. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.25) transparent;
+}
+
+@supports not (scrollbar-width: thin) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(255 255 255 / 0.22);
+    border: 2px solid transparent;
+    border-radius: var(--lg-radius-pill);
+    background-clip: padding-box;
+  }
+}
+
+.listItem {
+  border-radius: var(--lg-button-radius);
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .listItem:hover {
+    background-color: var(--lg-hover);
+  }
+}
+
+.sectionTitle,
+.sectionTitle-cards {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 0.5);
+}

@@ -1,0 +1,146 @@
+/* ==========================================================================
+   03 · Glass surfaces: drawers, menus, popovers, dialogs, sheets, tooltips
+   --------------------------------------------------------------------------
+   Jellyfin 12 mixes MUI (.Mui*) with the legacy dialog helpers (.dialog,
+   .actionSheet). Both families get the same pane.
+
+   Chromium note: backdrop-filter must not be nested. A child with its own
+   backdrop-filter inside a parent that also has one (or opacity, mask, filter)
+   only blurs the parent's content, which looks like "no blur". None of the
+   surfaces below contain each other, and nothing in the theme applies a
+   filter or mask to a surface's ancestors.
+   ========================================================================== */
+
+.MuiDrawer-paper,
+.mainDrawer,
+.MuiMenu-paper,
+.MuiPopover-paper,
+.MuiDialog-paper,
+.MuiAutocomplete-paper,
+.dialog,
+.actionSheet,
+.formDialog {
+  background: var(--lg-glass-bg) !important;
+  background-image: none !important;
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular), var(--lg-shadow-deep);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: var(--lg-text);
+}
+
+.MuiMenu-paper,
+.MuiPopover-paper,
+.MuiDialog-paper,
+.MuiAutocomplete-paper,
+.dialog,
+.actionSheet,
+.formDialog {
+  border-radius: var(--lg-radius-card);
+}
+
+/* --- Navigation drawer (mobile / narrow) and dashboard drawer ------------ */
+.MuiDrawer-paper,
+.mainDrawer {
+  border-width: 0 1px 0 0;
+  box-shadow: var(--lg-glass-shadow);
+}
+
+.MuiDrawer-paperAnchorLeft {
+  border-radius: 0 var(--lg-radius-card) var(--lg-radius-card) 0;
+}
+
+.mainDrawer-scrollContainer {
+  background: transparent !important;
+}
+
+.MuiDrawer-paper .MuiListItemButton-root,
+.navMenuOption,
+.lnkMediaFolder {
+  border-radius: var(--lg-button-radius);
+  color: var(--lg-text);
+  transition: background-color var(--lg-duration) var(--lg-ease), box-shadow var(--lg-duration) var(--lg-ease);
+}
+
+.MuiDrawer-paper .MuiListItemButton-root.Mui-selected,
+.navMenuOption-selected {
+  background-color: var(--lg-active) !important;
+  box-shadow: var(--lg-specular), 0 0 0 1px var(--lg-border-color);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .MuiDrawer-paper .MuiListItemButton-root:hover,
+  .navMenuOption:hover,
+  .lnkMediaFolder:hover {
+    background-color: var(--lg-hover);
+    box-shadow: var(--lg-specular);
+  }
+}
+
+/* --- Menus, list items, sheets ------------------------------------------- */
+.MuiMenuItem-root,
+.MuiAutocomplete-option,
+.actionSheetMenuItem {
+  border-radius: 10px;
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+.MuiMenuItem-root.Mui-selected,
+.MuiAutocomplete-option[aria-selected="true"] {
+  background-color: var(--lg-active);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .MuiMenuItem-root:hover,
+  .MuiAutocomplete-option:hover,
+  .actionSheetMenuItem:hover {
+    background-color: var(--lg-hover);
+  }
+}
+
+.MuiMenuItem-root.Mui-focusVisible,
+.actionSheetMenuItem:focus-visible {
+  background-color: var(--lg-hover);
+}
+
+.MuiDivider-root {
+  border-color: var(--lg-border-color);
+}
+
+/* --- Tooltips ------------------------------------------------------------ */
+.MuiTooltip-tooltip {
+  background: var(--lg-glass-bg-strong);
+  border: var(--lg-border);
+  border-radius: 10px;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: var(--lg-text);
+}
+
+/* --- Scrims (dimmer behind dialogs / drawers) ------------------------------
+   A light blur only. */
+.MuiBackdrop-root:not(.MuiBackdrop-invisible),
+.dialogBackdrop {
+  background: rgb(0 0 0 / 0.45) !important;
+  -webkit-backdrop-filter: var(--lg-filter-scrim);
+  backdrop-filter: var(--lg-filter-scrim);
+}
+
+/* While a video plays, blurring the whole screen every frame is wasted GPU. */
+body:has(.videoPlayerContainer) .MuiBackdrop-root:not(.MuiBackdrop-invisible),
+body:has(.videoPlayerContainer) .dialogBackdrop {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* --- Toasts -------------------------------------------------------------- */
+.toast,
+.MuiSnackbarContent-root {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-glass-shadow) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: #fff !important;
+}

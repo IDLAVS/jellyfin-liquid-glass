@@ -1,0 +1,85 @@
+/* ==========================================================================
+   07 · Item detail pages (movies, shows, episodes, people)
+   --------------------------------------------------------------------------
+   Layout is Jellyfin's own, except for the two-column details grid below.
+   The theme no longer repositions the backdrop, logo or poster with fixed
+   offsets: those magic numbers broke whenever the header height changed and
+   were a source of the backdrop jump on navigation.
+   ========================================================================== */
+
+/* Track selectors (left) and metadata (right) side by side on desktop, the
+   community fix from GlassFin issue #35, minus its !important flood.
+   Wide blocks (Next Up, season list) span both columns. */
+@media (min-width: 1025px) {
+  .itemDetailPage .detailPagePrimaryContent > .detailSection {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > .detailSectionContent {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: auto;
+  }
+
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > .trackSelections {
+    grid-column: 1;
+    grid-row: 2;
+    width: auto;
+  }
+
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > .itemDetailsGroup {
+    grid-column: 2;
+    grid-row: 2;
+    width: auto;
+  }
+
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > .nextUpSection,
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > #listChildrenCollapsible {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Nothing to show means no empty grid cell. */
+.itemDetailPage .detailPagePrimaryContent > .detailSection > .itemDetailsGroup:not(:has(> :not(:empty))) {
+  display: none;
+}
+
+/* Legibility over a bright backdrop. */
+.itemDetailPage .itemName,
+.itemDetailPage .itemMiscInfo,
+.itemDetailPage .overview {
+  text-shadow: 0 2px 16px rgb(0 0 0 / 0.6);
+}
+
+.itemDetailPage .detailLogo {
+  filter: drop-shadow(0 4px 24px rgb(0 0 0 / 0.5));
+}
+
+.itemDetailPage .starIcon {
+  color: var(--lg-accent-light);
+}
+
+.itemDetailPage .mediaInfoOfficialRating {
+  border: 1px solid rgb(255 255 255 / 0.55);
+  background: transparent !important;
+  box-shadow: none;
+}
+
+/* Metadata links (IMDb, TMDb...). Jellyfin Enhanced's Seerr/Arr links live in
+   the same container and size their own icons, so they are excluded. */
+.itemExternalLinks a:not(.arr-link, .seerr-link) {
+  display: inline-block;
+  padding: 0.3em 0.9em;
+  border-radius: var(--lg-radius-pill);
+  background: rgb(255 255 255 / 0.12);
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .itemExternalLinks a:not(.arr-link, .seerr-link):hover {
+    background: var(--lg-active);
+  }
+}

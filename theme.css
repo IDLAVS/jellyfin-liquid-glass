@@ -1,0 +1,1601 @@
+/*! Liquid Glass for Jellyfin 12.2 | v2.0.0 | MIT
+ * https://github.com/IDLAVS/jellyfin-liquid-glass
+ *
+ * GENERATED FILE. Do not edit by hand: change src/*.css and run `npm run build`.
+ * Sources: ./00-tokens.css, ./01-base.css, ./02-backdrop.css, ./03-surfaces.css, ./04-header.css, ./05-controls.css, ./06-cards.css, ./07-detail.css, ./08-player.css, ./plugins/media-bar.css, ./plugins/intro-skipper.css, ./plugins/episode-preview.css, ./plugins/jellyfin-enhanced.css, ./plugins/moonfin.css, ./99-fallbacks.css
+ */
+
+/* ==========================================================================
+   00 · Design tokens
+   --------------------------------------------------------------------------
+   Everything a user may want to change lives in the "Public settings" block.
+   Override any of them from Dashboard > General > Custom CSS, AFTER the
+   @import line:
+
+     :root { --lg-blur-radius: 32px; --lg-accent-rgb: 255 159 10; }
+
+   Rules
+   - Public settings are plain values (lengths, numbers, "R G B" triplets).
+   - Derived tokens are built from them, so user overrides flow through.
+   - Colours are written as rgb(R G B / alpha) so one triplet can be tinted
+     at any opacity without color-mix().
+   ========================================================================== */
+
+:root {
+  /* ---- Public settings -------------------------------------------------- */
+
+  /* Accent colour as an "R G B" triplet (no commas, no rgb()). */
+  --lg-accent-rgb: 10 132 255;
+
+  /* Glass: tint colour ("R G B"), how opaque the pane is (0-1), blur strength. */
+  --lg-glass-tint: 20 20 26;
+  --lg-glass-opacity: 0.55;
+  --lg-blur-radius: 24px;
+  --lg-blur-saturation: 180%;
+
+  /* Shape. */
+  --lg-card-radius: 16px;
+  --lg-button-radius: 12px;
+
+  /* Wallpaper. Needs an ABSOLUTE url(); falls back to the v1 variable names. */
+  --lg-wallpaper: var(--custom-bg, var(--bgImage, none));
+  --lg-wallpaper-brightness: 0.65; /* 1 = untouched, 0 = black */
+  --lg-wallpaper-blur: 0px;
+
+  /* Header pills fade slightly on pages with a full-bleed backdrop (0-1). */
+  --lg-header-idle-opacity: 0.85;
+
+  /* Solid layer behind the Media Bar slides (stops wallpaper showing through
+     during slide cross-fades). Set to transparent to turn it off. */
+  --lg-mediabar-base: rgb(8 8 12);
+
+  --lg-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- Derived tokens (do not edit; override the settings above) -------- */
+
+  --lg-accent: rgb(var(--lg-accent-rgb));
+  --lg-accent-soft: rgb(var(--lg-accent-rgb) / 0.35);
+  --lg-accent-glow: rgb(var(--lg-accent-rgb) / 0.45);
+  --lg-accent-light: rgb(var(--lg-accent-rgb) / 0.75);
+
+  --lg-glass-bg: rgb(var(--lg-glass-tint) / var(--lg-glass-opacity));
+  --lg-glass-bg-strong: rgb(var(--lg-glass-tint) / calc(var(--lg-glass-opacity) + 0.2));
+  --lg-glass-bg-solid: rgb(var(--lg-glass-tint) / 0.96);
+  --lg-page-base: rgb(10 10 14);
+
+  --lg-filter: blur(var(--lg-blur-radius)) saturate(var(--lg-blur-saturation));
+  --lg-filter-strong: blur(calc(var(--lg-blur-radius) * 1.4)) saturate(var(--lg-blur-saturation));
+  --lg-filter-scrim: blur(calc(var(--lg-blur-radius) * 0.25));
+
+  --lg-border-color: rgb(255 255 255 / 0.14);
+  --lg-border-color-strong: rgb(255 255 255 / 0.3);
+  --lg-border: 1px solid var(--lg-border-color);
+
+  --lg-hover: rgb(255 255 255 / 0.1);
+  --lg-active: rgb(255 255 255 / 0.16);
+
+  --lg-text: rgb(255 255 255 / 0.92);
+  --lg-text-dim: rgb(255 255 255 / 0.62);
+
+  --lg-specular: inset 0 1px 1px 0 rgb(255 255 255 / 0.2);
+  --lg-shadow: 0 12px 32px rgb(0 0 0 / 0.4);
+  --lg-shadow-deep: 0 24px 56px rgb(0 0 0 / 0.55), 0 4px 12px rgb(0 0 0 / 0.3);
+  --lg-glass-shadow: var(--lg-specular), var(--lg-shadow);
+  --lg-glow: 0 0 0 1px rgb(255 255 255 / 0.22), 0 0 24px var(--lg-accent-glow);
+
+  --lg-radius-card: var(--lg-card-radius);
+  --lg-radius-pill: 9999px;
+  --lg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --lg-duration: 0.25s;
+}
+
+/* ==========================================================================
+   01 · Base: palette bridge, typography, page layers, wallpaper, scrollbars
+   ========================================================================== */
+
+/* Jellyfin 12 builds its UI with MUI and exposes the palette as --jf-palette-*
+   custom properties. Setting those is far more stable than chasing the
+   generated (hashed) Emotion class names, which change between builds.
+   The double selector beats the generated :root[data-theme] block. */
+:root,
+:root[data-theme] {
+  color-scheme: dark;
+
+  --jf-palette-background-default: var(--lg-page-base);
+  --jf-palette-background-defaultChannel: 10 10 14;
+  --jf-palette-background-paper: var(--lg-glass-bg-strong);
+  --jf-palette-background-paperChannel: var(--lg-glass-tint);
+
+  --jf-palette-AppBar-defaultBg: transparent;
+  --jf-palette-AppBar-transparentBg: transparent;
+
+  --jf-palette-text-primary: var(--lg-text);
+  --jf-palette-text-primaryChannel: 255 255 255;
+  --jf-palette-text-secondary: var(--lg-text-dim);
+  --jf-palette-text-secondaryChannel: 255 255 255;
+  --jf-palette-common-white: #fff;
+  --jf-palette-common-whiteChannel: 255 255 255;
+
+  --jf-palette-primary-main: var(--lg-accent);
+  --jf-palette-primary-mainChannel: var(--lg-accent-rgb);
+  --jf-palette-primary-light: var(--lg-accent-light);
+  --jf-palette-primary-contrastText: #fff;
+  --jf-palette-secondary-main: var(--lg-accent);
+  --jf-palette-secondary-mainChannel: var(--lg-accent-rgb);
+
+  --jf-palette-divider: var(--lg-border-color);
+  --jf-palette-dividerChannel: 255 255 255;
+  --jf-palette-action-hover: var(--lg-hover);
+  --jf-palette-action-selected: var(--lg-active);
+  --jf-palette-action-focus: var(--lg-hover);
+  --jf-palette-action-active: var(--lg-text);
+
+  --jf-palette-FilledInput-bg: rgb(255 255 255 / 0.06);
+  --jf-palette-SnackbarContent-bg: var(--lg-glass-bg-strong);
+  --jf-palette-SnackbarContent-color: #fff;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--lg-font);
+}
+
+/* MUI components declare their own font; make them inherit. Icon fonts are
+   excluded so Material Icons keep rendering. */
+[class*="Mui"]:not(.MuiIcon-root) {
+  font-family: inherit;
+}
+
+html {
+  background: var(--lg-page-base);
+  color: var(--lg-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* The wallpaper lives on .backgroundContainer, so every layer above it has to
+   be see-through. These are the only layout-neutral rules the theme needs. */
+body,
+#reactRoot,
+.page,
+.view,
+.mainAnimatedPages,
+.mainAnimatedPage {
+  background: transparent !important;
+}
+
+::selection {
+  background: var(--lg-accent-soft);
+  color: #fff;
+}
+
+/* --- Wallpaper -------------------------------------------------------------
+   Painted on a pseudo-element so brightness and blur can be filtered without
+   dimming anything else. It fades out (rather than snapping) when Jellyfin
+   switches the page to a backdrop, see 02-backdrop.css. */
+.backgroundContainer::before {
+  content: "";
+  position: fixed;
+  inset: calc(var(--lg-wallpaper-blur) * -2);
+  z-index: -1;
+  background: var(--lg-wallpaper) center / cover no-repeat;
+  filter: brightness(var(--lg-wallpaper-brightness)) blur(var(--lg-wallpaper-blur));
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.45s ease;
+}
+
+/* --- Scrollbars ------------------------------------------------------------
+   Chromium 121+ and Firefox use the standard properties; the -webkit-
+   pseudo-elements are only a fallback for older WebKit/Blink. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.25) transparent;
+}
+
+@supports not (scrollbar-width: thin) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(255 255 255 / 0.22);
+    border: 2px solid transparent;
+    border-radius: var(--lg-radius-pill);
+    background-clip: padding-box;
+  }
+}
+
+.listItem {
+  border-radius: var(--lg-button-radius);
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .listItem:hover {
+    background-color: var(--lg-hover);
+  }
+}
+
+.sectionTitle,
+.sectionTitle-cards {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 0.5);
+}
+
+/* ==========================================================================
+   02 · Backdrop handling (Jellyfin 12 detail-page transitions)
+   --------------------------------------------------------------------------
+   Jellyfin renders two fixed layers behind the UI:
+     .backgroundContainer   page colour; gains .withBackdrop on pages that show
+                            an item backdrop
+     .backdropContainer     holds the .backdropImage elements that fade in/out
+
+   The flash seen when moving between movie/show pages came from CSS that was
+   toggled with  body:has(.itemDetailPage:not(.hide))  (background-image, mask).
+   During a route change the old and new page both exist for a moment, so that
+   condition flipped true -> false -> true and the layers snapped.
+
+   Fix: nothing here depends on page state. The mask is permanent, and every
+   visual change that follows .withBackdrop is a cross-fade, never a snap.
+   ========================================================================== */
+
+:root {
+  --lg-backdrop-mask: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.6) 55%, transparent 100%);
+  --lg-backdrop-fade: 0.45s;
+}
+
+.backgroundContainer {
+  transition: background-color var(--lg-backdrop-fade) ease;
+}
+
+.backgroundContainer::before {
+  transition-duration: var(--lg-backdrop-fade);
+}
+
+/* Wallpaper hands over to the item backdrop instead of painting under it. */
+.backgroundContainer.withBackdrop::before {
+  opacity: 0;
+}
+
+.backdropContainer {
+  -webkit-mask-image: var(--lg-backdrop-mask);
+  mask-image: var(--lg-backdrop-mask);
+}
+
+/* Own compositor layer + explicit fade: keeps the cross-fade from repainting
+   (and flashing) when the mask or header glass recomposites above it. */
+.backdropImage {
+  transition: opacity var(--lg-backdrop-fade) ease;
+  backface-visibility: hidden;
+  will-change: opacity;
+}
+
+/* ==========================================================================
+   03 · Glass surfaces: drawers, menus, popovers, dialogs, sheets, tooltips
+   --------------------------------------------------------------------------
+   Jellyfin 12 mixes MUI (.Mui*) with the legacy dialog helpers (.dialog,
+   .actionSheet). Both families get the same pane.
+
+   Chromium note: backdrop-filter must not be nested. A child with its own
+   backdrop-filter inside a parent that also has one (or opacity, mask, filter)
+   only blurs the parent's content, which looks like "no blur". None of the
+   surfaces below contain each other, and nothing in the theme applies a
+   filter or mask to a surface's ancestors.
+   ========================================================================== */
+
+.MuiDrawer-paper,
+.mainDrawer,
+.MuiMenu-paper,
+.MuiPopover-paper,
+.MuiDialog-paper,
+.MuiAutocomplete-paper,
+.dialog,
+.actionSheet,
+.formDialog {
+  background: var(--lg-glass-bg) !important;
+  background-image: none !important;
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular), var(--lg-shadow-deep);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: var(--lg-text);
+}
+
+.MuiMenu-paper,
+.MuiPopover-paper,
+.MuiDialog-paper,
+.MuiAutocomplete-paper,
+.dialog,
+.actionSheet,
+.formDialog {
+  border-radius: var(--lg-radius-card);
+}
+
+/* --- Navigation drawer (mobile / narrow) and dashboard drawer ------------ */
+.MuiDrawer-paper,
+.mainDrawer {
+  border-width: 0 1px 0 0;
+  box-shadow: var(--lg-glass-shadow);
+}
+
+.MuiDrawer-paperAnchorLeft {
+  border-radius: 0 var(--lg-radius-card) var(--lg-radius-card) 0;
+}
+
+.mainDrawer-scrollContainer {
+  background: transparent !important;
+}
+
+.MuiDrawer-paper .MuiListItemButton-root,
+.navMenuOption,
+.lnkMediaFolder {
+  border-radius: var(--lg-button-radius);
+  color: var(--lg-text);
+  transition: background-color var(--lg-duration) var(--lg-ease), box-shadow var(--lg-duration) var(--lg-ease);
+}
+
+.MuiDrawer-paper .MuiListItemButton-root.Mui-selected,
+.navMenuOption-selected {
+  background-color: var(--lg-active) !important;
+  box-shadow: var(--lg-specular), 0 0 0 1px var(--lg-border-color);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .MuiDrawer-paper .MuiListItemButton-root:hover,
+  .navMenuOption:hover,
+  .lnkMediaFolder:hover {
+    background-color: var(--lg-hover);
+    box-shadow: var(--lg-specular);
+  }
+}
+
+/* --- Menus, list items, sheets ------------------------------------------- */
+.MuiMenuItem-root,
+.MuiAutocomplete-option,
+.actionSheetMenuItem {
+  border-radius: 10px;
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+.MuiMenuItem-root.Mui-selected,
+.MuiAutocomplete-option[aria-selected="true"] {
+  background-color: var(--lg-active);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .MuiMenuItem-root:hover,
+  .MuiAutocomplete-option:hover,
+  .actionSheetMenuItem:hover {
+    background-color: var(--lg-hover);
+  }
+}
+
+.MuiMenuItem-root.Mui-focusVisible,
+.actionSheetMenuItem:focus-visible {
+  background-color: var(--lg-hover);
+}
+
+.MuiDivider-root {
+  border-color: var(--lg-border-color);
+}
+
+/* --- Tooltips ------------------------------------------------------------ */
+.MuiTooltip-tooltip {
+  background: var(--lg-glass-bg-strong);
+  border: var(--lg-border);
+  border-radius: 10px;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: var(--lg-text);
+}
+
+/* --- Scrims (dimmer behind dialogs / drawers) ------------------------------
+   A light blur only. */
+.MuiBackdrop-root:not(.MuiBackdrop-invisible),
+.dialogBackdrop {
+  background: rgb(0 0 0 / 0.45) !important;
+  -webkit-backdrop-filter: var(--lg-filter-scrim);
+  backdrop-filter: var(--lg-filter-scrim);
+}
+
+/* While a video plays, blurring the whole screen every frame is wasted GPU. */
+body:has(.videoPlayerContainer) .MuiBackdrop-root:not(.MuiBackdrop-invisible),
+body:has(.videoPlayerContainer) .dialogBackdrop {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* --- Toasts -------------------------------------------------------------- */
+.toast,
+.MuiSnackbarContent-root {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-glass-shadow) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: #fff !important;
+}
+
+/* ==========================================================================
+   04 · Header (Jellyfin 12 MUI AppBar) and library toolbar
+   --------------------------------------------------------------------------
+   Jellyfin 12 replaced the legacy .skinHeader with a fixed MUI <AppBar>:
+
+     .MuiAppBar-root
+       .MuiToolbar-root (first)   [menu button] · .MuiStack-root (library
+                                  buttons) · .MuiBox-root (icons) x2
+       .MuiToolbar-root (library pages only)  view menu · sort / filter groups
+     div[aria-hidden="true"]      empty spacer that pushes the page below the bar
+
+   The bar itself becomes invisible and its groups float as glass pills.
+
+   Deliberately NOT done here:
+   - No selectors on generated Emotion classes (.css-1abc23). They change on
+     every Jellyfin build and were the first thing to break after 12.0.
+   - The spacer after the bar is left alone. Pulling the page up with negative
+     margins (an early community workaround) breaks the Media Bar's offset
+     measurement and every page that already clears the header.
+   - Hover never adds borders or padding, only colour and shadow. A hover
+     border grows the button and pushes the library grid down.
+   ========================================================================== */
+
+.MuiAppBar-root {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* --- Shared pane for every pill ------------------------------------------ */
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root,
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root:not(:empty),
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiButton-root {
+  background: var(--lg-glass-bg);
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill);
+  box-shadow: var(--lg-glass-shadow);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  transition: opacity var(--lg-duration) ease;
+}
+
+/* --- Navigation pill (library buttons) ------------------------------------ */
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root {
+  align-items: center;
+  padding: 3px;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root > .MuiButton-root {
+  min-height: 38px;
+  padding: 4px 14px;
+  border-radius: var(--lg-radius-pill) !important;
+  color: var(--lg-text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root > .MuiButton-root:hover {
+  background-color: var(--lg-hover);
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root > .MuiButton-colorPrimary,
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root > .MuiButton-textPrimary {
+  background-color: var(--lg-active);
+  box-shadow: var(--lg-specular);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* --- Icon pill (sync, cast, search, plugins, avatar) ---------------------- */
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root {
+  flex-grow: 0 !important;
+  align-items: center;
+  padding: 3px;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root ~ .MuiBox-root:not(:empty) {
+  margin-left: auto;
+}
+
+/* Two adjacent icon boxes read as one joined pill. */
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root:not(:empty) + .MuiBox-root:not(:empty) {
+  margin-left: 0;
+  border-left-width: 0;
+  border-radius: 0 var(--lg-radius-pill) var(--lg-radius-pill) 0;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root:not(:empty):has(+ .MuiBox-root:not(:empty)) {
+  border-right-width: 0;
+  border-radius: var(--lg-radius-pill) 0 0 var(--lg-radius-pill);
+}
+
+.MuiAppBar-root .MuiIconButton-root {
+  padding: 7px;
+  color: var(--lg-text);
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .MuiAppBar-root .MuiIconButton-root:hover:not(:disabled) {
+    background-color: var(--lg-hover);
+    box-shadow: var(--lg-specular);
+  }
+}
+
+/* The avatar is 40px by default; match it to the other icons. */
+.MuiAppBar-root .MuiIconButton-root[aria-controls="app-user-menu"] {
+  padding: 4px;
+}
+
+.MuiAppBar-root .MuiAvatar-root {
+  width: 28px;
+  height: 28px;
+  font-size: 1rem;
+}
+
+.MuiAppBar-root .MuiAvatar-root img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Wide screens: centre the navigation pill between the edge controls. */
+@media (min-width: 1200px) {
+  .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root ~ .MuiBox-root:not(:empty) {
+    margin-left: 0;
+  }
+}
+
+/* --- Pages with a full-bleed backdrop (items, people) --------------------- */
+/* The pills sit over faces and posters here; soften them until hovered. */
+body:has(.selfBackdropPage:not(.hide)) .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root:not(:hover, :focus-within) {
+  opacity: var(--lg-header-idle-opacity);
+}
+
+/* --- Library toolbar (second row on Movies / Shows / Music ...) ----------- */
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root {
+  justify-content: center;
+  gap: 4px;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiButton-root {
+  min-height: 38px;
+  padding: 0 16px;
+  color: var(--lg-text);
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root .MuiTypography-h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiBox-root {
+  flex-grow: 0 !important;
+  margin-left: 0 !important;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiStack-root {
+  flex-grow: 0 !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Item count: plain text, not a chip. */
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root .MuiChip-root {
+  height: auto;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--lg-text);
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+/* Sort / filter / view controls: flat round icons. */
+.MuiAppBar-root .MuiButtonGroup-root {
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: var(--lg-text) !important;
+  font-size: 0;
+}
+
+.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root .MuiButton-startIcon {
+  margin: 0;
+}
+
+.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root:hover {
+  background: var(--lg-hover) !important;
+}
+
+.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root:disabled {
+  opacity: 0.35;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiStack-root > .MuiBox-root {
+  order: 2;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiStack-root > .MuiButtonGroup-root {
+  order: 3;
+  flex-direction: row-reverse;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiStack-root > .MuiButtonGroup-root:last-child {
+  order: 1;
+  flex-direction: row;
+}
+
+/* --- Library views as a centred tab pill (wide screens) --------------------
+   Jellyfin keeps the views menu (#library-view-menu) mounted but closed. On
+   wide screens it is shown in place of the dropdown button. The guard on
+   body:has(#library-view-menu) means the dropdown button is only hidden when
+   the menu actually exists, so navigation can never disappear. */
+@media (min-width: 1200px) {
+  .MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root {
+    min-height: 0;
+    margin-top: 56px;
+  }
+
+  body:has(#library-view-menu) .MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiButton-root {
+    display: none;
+  }
+
+  #library-view-menu {
+    visibility: visible !important;
+    position: fixed !important;
+    top: 52px !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+    height: auto !important;
+    transform: translateX(-50%);
+    z-index: 1101 !important;
+    pointer-events: none;
+  }
+
+  #library-view-menu .MuiBackdrop-root {
+    display: none !important;
+  }
+
+  #library-view-menu .MuiPopover-paper {
+    position: static !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 3px;
+    border-radius: var(--lg-radius-pill) !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    transform: none !important;
+    transition: none !important;
+    visibility: visible !important;
+    pointer-events: auto;
+  }
+
+  #library-view-menu .MuiList-root {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    padding: 0;
+  }
+
+  #library-view-menu .MuiMenuItem-root {
+    min-height: 38px;
+    margin: 0 !important;
+    padding: 4px 22px;
+    border-radius: var(--lg-radius-pill);
+    color: var(--lg-text);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  #library-view-menu .MuiMenuItem-root.Mui-selected {
+    background-color: var(--lg-active) !important;
+    box-shadow: var(--lg-specular);
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+/* --- A-Z jump bar --------------------------------------------------------- */
+/* Centred vertically and capped to the viewport so neither end is clipped. */
+.alphaPicker-fixed-right.MuiBox-root {
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+  height: auto !important;
+  max-height: calc(100vh - 12rem) !important;
+}
+
+.alphaPicker-fixed-right .MuiPaper-root {
+  background: var(--lg-glass-bg);
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill);
+  box-shadow: var(--lg-glass-shadow);
+  padding: 6px 0;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+.alphaPicker-fixed-right .MuiToggleButton-root {
+  border-radius: var(--lg-radius-pill) !important;
+  color: var(--lg-text-dim);
+}
+
+.alphaPicker-fixed-right .MuiToggleButton-root:hover {
+  background-color: var(--lg-hover);
+  color: #fff;
+}
+
+.alphaPicker-fixed-right .MuiToggleButton-root.Mui-selected {
+  background-color: var(--lg-active);
+  color: #fff;
+}
+
+/* ==========================================================================
+   05 · Controls: buttons, inputs, badges, progress, sliders
+   ========================================================================== */
+
+.button-flat,
+.emby-button,
+.raised,
+.detailButton,
+.paper-icon-button-light,
+.MuiButton-root {
+  border-radius: var(--lg-button-radius);
+  transition:
+    background-color var(--lg-duration) var(--lg-ease),
+    box-shadow var(--lg-duration) var(--lg-ease),
+    transform var(--lg-duration) var(--lg-ease);
+}
+
+/* Filled / primary buttons */
+.raised,
+.button-submit,
+.MuiButton-contained {
+  background: var(--lg-hover) !important;
+  border: var(--lg-border) !important;
+  box-shadow: var(--lg-glass-shadow) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: #fff !important;
+}
+
+.button-submit,
+.btnPlay.raised,
+.MuiButton-containedPrimary {
+  background: linear-gradient(180deg, var(--lg-accent-light), var(--lg-accent-soft)) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .raised:hover,
+  .button-submit:hover,
+  .MuiButton-contained:hover {
+    background-color: var(--lg-active) !important;
+    box-shadow: var(--lg-specular), var(--lg-glow) !important;
+  }
+}
+
+.emby-button:active,
+.raised:active {
+  transform: scale(0.97);
+}
+
+/* Keyboard focus: one consistent ring, MUI and legacy alike. */
+.Mui-focusVisible,
+.emby-button:focus-visible,
+.paper-icon-button-light:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+/* --- Inputs ---------------------------------------------------------------- */
+.emby-input,
+.emby-textarea,
+.emby-select,
+.MuiInputBase-root,
+.MuiOutlinedInput-root,
+.MuiFilledInput-root {
+  background: rgb(255 255 255 / 0.06) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-button-radius) !important;
+  box-shadow: var(--lg-specular);
+  color: var(--lg-text) !important;
+}
+
+.MuiFilledInput-root::before,
+.MuiFilledInput-root::after {
+  border-bottom: 0 !important;
+}
+
+.emby-input:focus,
+.emby-textarea:focus,
+.emby-select:focus {
+  border-color: var(--lg-border-color-strong) !important;
+  box-shadow: var(--lg-specular), 0 0 0 3px var(--lg-accent-soft);
+  outline: none;
+}
+
+.searchfields-txtSearch,
+.searchFields .emby-input,
+.MuiAutocomplete-root .MuiInputBase-root {
+  border-radius: var(--lg-radius-pill) !important;
+  padding-left: 1.25em !important;
+  padding-right: 1.25em !important;
+}
+
+.MuiCheckbox-root.Mui-checked,
+.MuiRadio-root.Mui-checked,
+.MuiSwitch-switchBase.Mui-checked {
+  color: var(--lg-accent);
+}
+
+.MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+  background-color: var(--lg-accent);
+}
+
+/* --- Badges and chips ------------------------------------------------------ */
+.countIndicator,
+.playedIndicator,
+.unplayedItemsIndicator,
+.mediaInfoOfficialRating,
+.mediaInfoItem,
+.mediaInfoCriticRating,
+.starRatingContainer,
+.MuiChip-root {
+  border-radius: var(--lg-radius-pill) !important;
+}
+
+/* Small, so a real blur is cheap; no nested glass inside them. */
+.countIndicator,
+.playedIndicator,
+.unplayedItemsIndicator,
+.mediaInfoOfficialRating {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular);
+  color: #fff !important;
+}
+
+/* --- Progress and sliders -------------------------------------------------- */
+.itemProgressBar,
+.itemLinearProgress.MuiLinearProgress-root {
+  overflow: hidden;
+  border-radius: var(--lg-radius-pill);
+}
+
+.itemProgressBarForeground,
+.itemLinearProgress .MuiLinearProgress-bar {
+  background: linear-gradient(90deg, var(--lg-accent), var(--lg-accent-light)) !important;
+  border-radius: var(--lg-radius-pill);
+}
+
+.mdl-slider-background-flex,
+.mdl-slider-background-lower,
+.mdl-slider-background-upper {
+  border-radius: var(--lg-radius-pill);
+}
+
+.mdl-slider-background-upper {
+  background: rgb(255 255 255 / 0.18) !important;
+}
+
+.mdl-slider-background-lower {
+  background: linear-gradient(90deg, var(--lg-accent), var(--lg-accent-light)) !important;
+}
+
+.mdl-slider::-webkit-slider-thumb {
+  background: #fff !important;
+  border: 0;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.5), 0 0 0 4px rgb(255 255 255 / 0.18);
+}
+
+.mdl-slider::-moz-range-thumb {
+  background: #fff !important;
+  border: 0;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.5), 0 0 0 4px rgb(255 255 255 / 0.18);
+}
+
+.sliderBubble {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-glass-shadow);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+/* ==========================================================================
+   06 · Media cards
+   --------------------------------------------------------------------------
+   Card anatomy (from jellyfin-web's cardBuilder):
+
+     .card[data-type]
+       .cardBox                      has will-change + a transform transition
+         .cardScalable               position: relative; contain: layout style
+           .cardPadder-*  .cardImageContainer  .cardIndicators
+           .innerCardFooter  .cardOverlayContainer  .cardOverlayButton*
+         .cardFooter / .cardText
+
+   Hover ghosting (stuck lifted or enlarged cards, shadows left behind) came
+   from four things, all addressed here:
+
+   1. Two competing transforms. Jellyfin already scales a focused card
+      (.card.show-animation:focus > .cardBox { transform: scale(1.07) }) and a
+      mouse click leaves focus on the card, so the clicked card stayed
+      enlarged while the hovered one lifted. The lift now uses the independent
+      `translate` property, and the focus scale only applies to keyboard /
+      remote focus (:focus-visible).
+   2. backdrop-filter on every card and on the hidden overlay buttons. A
+      blur over an opaque poster does nothing visible, but it forces a
+      compositing layer per card and leaves stale paint behind in Chromium.
+      Cards and their overlay buttons use plain translucent fills instead.
+   3. `transition: all`. Only transform/translate/box-shadow/outline animate.
+   4. Hover styles on touch devices, which stick after a tap. Everything that
+      reacts to hover sits inside (hover: hover) and (pointer: fine).
+
+   Person (cast) cards are left alone so round avatars stay round.
+   ========================================================================== */
+
+.card:not([data-type="Person"]) .cardScalable {
+  border-radius: var(--lg-radius-card);
+  overflow: hidden;
+  background-color: var(--lg-glass-bg);
+  /* outline, not border: it does not change the card's box size */
+  outline: 1px solid var(--lg-border-color);
+  outline-offset: -1px;
+  box-shadow: var(--lg-specular);
+  transition: box-shadow 0.3s var(--lg-ease), outline-color 0.3s var(--lg-ease);
+}
+
+.card:not([data-type="Person"]) .cardImageContainer,
+.card:not([data-type="Person"]) .cardOverlayContainer {
+  border-radius: inherit;
+}
+
+/* Keep Jellyfin's own transform transition and add translate to it. */
+.card .cardBox,
+.card.show-animation .cardBox {
+  transition: transform 200ms ease-out, translate 0.3s var(--lg-ease);
+}
+
+.card .cardBox {
+  backface-visibility: hidden;
+}
+
+/* Mouse click must not leave a card enlarged. */
+.card.show-animation:focus:not(:focus-visible) > .cardBox {
+  transform: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:not([data-type="Person"]) .cardBox:hover {
+    translate: 0 -4px;
+  }
+
+  .card:not([data-type="Person"]) .cardBox:hover .cardScalable,
+  .card:not([data-type="Person"]):focus-visible .cardScalable {
+    outline-color: var(--lg-border-color-strong);
+    box-shadow:
+      var(--lg-specular),
+      0 0 0 1px rgb(255 255 255 / 0.2),
+      0 0 28px var(--lg-accent-soft),
+      0 18px 40px rgb(0 0 0 / 0.5);
+  }
+}
+
+.cardOverlayContainer {
+  background: linear-gradient(to top, rgb(0 0 0 / 0.55), transparent 60%) !important;
+}
+
+/* v12 renders the corner buttons as MUI icon buttons, older builds as
+   <button is="paper-icon-button-light">. */
+.cardOverlayButton,
+.cardOverlayButton-br .MuiIconButton-root {
+  background: rgb(var(--lg-glass-tint) / 0.72) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-specular);
+  color: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cardOverlayButton:hover,
+  .cardOverlayButton-br .MuiIconButton-root:hover {
+    background: rgb(var(--lg-glass-tint) / 0.9) !important;
+    box-shadow: var(--lg-specular), var(--lg-glow);
+  }
+}
+
+.cardText {
+  color: var(--lg-text);
+}
+
+.cardText-secondary {
+  color: var(--lg-text-dim);
+}
+
+/* Centred captions on library and detail pages (not the home rows). */
+.page:not(.homePage) .cardText {
+  text-align: center;
+}
+
+/* The main poster on an item page. */
+.detailImageContainer .cardScalable,
+.detailImageContainer .cardImageContainer {
+  border-radius: var(--lg-radius-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card .cardBox,
+  .card.show-animation .cardBox {
+    transition: none;
+  }
+
+  .card:not([data-type="Person"]) .cardBox:hover {
+    translate: none;
+  }
+}
+
+/* ==========================================================================
+   07 · Item detail pages (movies, shows, episodes, people)
+   --------------------------------------------------------------------------
+   Layout is Jellyfin's own, except for the two-column details grid below.
+   The theme no longer repositions the backdrop, logo or poster with fixed
+   offsets: those magic numbers broke whenever the header height changed and
+   were a source of the backdrop jump on navigation.
+   ========================================================================== */
+
+/* Track selectors (left) and metadata (right) side by side on desktop, the
+   community fix from GlassFin issue #35, minus its !important flood.
+   Wide blocks (Next Up, season list) span both columns. */
+@media (min-width: 1025px) {
+  .itemDetailPage .detailPagePrimaryContent > .detailSection {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > .detailSectionContent {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: auto;
+  }
+
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > .trackSelections {
+    grid-column: 1;
+    grid-row: 2;
+    width: auto;
+  }
+
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > .itemDetailsGroup {
+    grid-column: 2;
+    grid-row: 2;
+    width: auto;
+  }
+
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > .nextUpSection,
+  .itemDetailPage .detailPagePrimaryContent > .detailSection > #listChildrenCollapsible {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Nothing to show means no empty grid cell. */
+.itemDetailPage .detailPagePrimaryContent > .detailSection > .itemDetailsGroup:not(:has(> :not(:empty))) {
+  display: none;
+}
+
+/* Legibility over a bright backdrop. */
+.itemDetailPage .itemName,
+.itemDetailPage .itemMiscInfo,
+.itemDetailPage .overview {
+  text-shadow: 0 2px 16px rgb(0 0 0 / 0.6);
+}
+
+.itemDetailPage .detailLogo {
+  filter: drop-shadow(0 4px 24px rgb(0 0 0 / 0.5));
+}
+
+.itemDetailPage .starIcon {
+  color: var(--lg-accent-light);
+}
+
+.itemDetailPage .mediaInfoOfficialRating {
+  border: 1px solid rgb(255 255 255 / 0.55);
+  background: transparent !important;
+  box-shadow: none;
+}
+
+/* Metadata links (IMDb, TMDb...). Jellyfin Enhanced's Seerr/Arr links live in
+   the same container and size their own icons, so they are excluded. */
+.itemExternalLinks a:not(.arr-link, .seerr-link) {
+  display: inline-block;
+  padding: 0.3em 0.9em;
+  border-radius: var(--lg-radius-pill);
+  background: rgb(255 255 255 / 0.12);
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .itemExternalLinks a:not(.arr-link, .seerr-link):hover {
+    background: var(--lg-active);
+  }
+}
+
+/* ==========================================================================
+   08 · Now-playing bar and video OSD
+   ========================================================================== */
+
+.nowPlayingBar {
+  background: var(--lg-glass-bg) !important;
+  border: var(--lg-border);
+  border-width: 1px 0 0 0;
+  border-radius: var(--lg-radius-card) var(--lg-radius-card) 0 0;
+  box-shadow: var(--lg-glass-shadow);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: var(--lg-text);
+}
+
+.nowPlayingBarInfoContainer,
+.nowPlayingBarCenter,
+.nowPlayingPage,
+.nowPlayingPlaylist,
+.nowPlayingInfoContainer {
+  background: transparent !important;
+}
+
+.nowPlayingImage,
+.nowPlayingBarImage {
+  border-radius: 10px;
+}
+
+.videoOsdBottom,
+.upNextContainer {
+  background: var(--lg-glass-bg-strong) !important;
+  border-top: var(--lg-border);
+  border-radius: var(--lg-radius-card) var(--lg-radius-card) 0 0;
+  box-shadow: var(--lg-glass-shadow);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+.osdHeader {
+  background: var(--lg-glass-bg-strong) !important;
+  border-bottom: var(--lg-border);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nowPlayingBar .emby-button:hover,
+  .videoOsdBottom .emby-button:hover,
+  .nowPlayingPage .emby-button:hover,
+  .osdHeader .MuiIconButton-root:hover {
+    background-color: var(--lg-hover);
+  }
+}
+
+/* ==========================================================================
+   PLUGIN · Media Bar  (IAmParadox27/jellyfin-plugin-media-bar)
+   --------------------------------------------------------------------------
+   Selectors come from the plugin's own stylesheet (slideshowpure.css):
+   #slides-container > .slide > .backdrop-container / .slide-content / ...
+
+   Alignment with the header
+   The plugin measures where the page starts and publishes it as
+   --slideshow-page-offset, then positions #slides-container and
+   .homeSectionsContainer from that. The theme therefore must not change the
+   top margin/padding of the page or the header spacer, and it does not. (The
+   old GlassFin workaround  #slides-container { top: calc(-1 * var(--appBarHeight)) }
+   double-counts the offset on Jellyfin 12 and is intentionally not carried over.)
+
+   Wallpaper bleed-through
+   Slides cross-fade by opacity. At the midpoint two half-transparent slides
+   leave ~25% of whatever is behind them visible, and a slide that is still
+   loading (.awaiting-image / .image-failed) is fully transparent. Behind the
+   slides we put a solid base that uses the plugin's own bottom-fade mask, so
+   the wallpaper never shows through the bar but still blends into the page
+   below it. If a Media Bar layout wants the page visible inside the bar, set
+   --lg-mediabar-base: transparent.
+
+   Geometry (size, position, margin, padding) is never touched here.
+   ========================================================================== */
+
+#slides-container {
+  isolation: isolate;
+}
+
+#slides-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--lg-mediabar-base);
+  -webkit-mask-image: var(--slideshow-bottom-fade, linear-gradient(to bottom, #000 70%, transparent 100%));
+  mask-image: var(--slideshow-bottom-fade, linear-gradient(to bottom, #000 70%, transparent 100%));
+  pointer-events: none;
+}
+
+/* Action buttons: glass pills. */
+#slides-container :is(.play-button, .detail-button, .favorite-button, .trailer-button) {
+  background-color: rgb(var(--lg-glass-tint) / 0.45);
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  transition:
+    background-color var(--lg-duration) var(--lg-ease),
+    box-shadow var(--lg-duration) var(--lg-ease),
+    border-color var(--lg-duration) var(--lg-ease);
+}
+
+#slides-container .play-button {
+  background-image: linear-gradient(180deg, var(--lg-accent-light), var(--lg-accent-soft));
+}
+
+/* Arrows and pause / mute: glass circles. */
+#slides-container :is(.arrow, .pause-button, .mute-button, .volume-toggle) {
+  background-color: rgb(var(--lg-glass-tint) / 0.45);
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+#slides-container .dot.active {
+  background-color: var(--lg-accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #slides-container :is(.play-button, .detail-button, .favorite-button, .trailer-button, .arrow, .pause-button, .mute-button, .volume-toggle):hover {
+    background-color: rgb(var(--lg-glass-tint) / 0.7);
+    border-color: var(--lg-border-color-strong);
+    box-shadow: var(--lg-specular), var(--lg-glow);
+  }
+}
+
+/* ==========================================================================
+   PLUGIN · Intro Skipper  (intro-skipper/intro-skipper)
+   --------------------------------------------------------------------------
+   Current Intro Skipper no longer injects its own button. It writes media
+   segments and Jellyfin's native player shows the skip control, which is
+   .skip-button inside .skip-button-container. Older plugin builds injected
+   #skipIntro / #skipCredits instead; those stay listed so they still match.
+
+   The control sits at the player's lower right and fades with the OSD. This
+   block only paints it as glass. It never sets position, bottom/right, margin,
+   or size, so wherever Jellyfin (or another CSS snippet) puts it is respected.
+
+   Clipping: the hover glow is a box-shadow, which any ancestor with
+   overflow: hidden would cut off. The container is made overflow: visible,
+   and the label can't wrap or be truncated.
+   ========================================================================== */
+
+.skip-button-container {
+  overflow: visible;
+}
+
+.skip-button,
+#skipIntro,
+#skipCredits {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-glass-shadow) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: #fff !important;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: visible;
+  transition:
+    background-color var(--lg-duration) var(--lg-ease),
+    border-color var(--lg-duration) var(--lg-ease),
+    box-shadow var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .skip-button:hover,
+  #skipIntro:hover,
+  #skipCredits:hover {
+    background: var(--lg-glass-bg-solid) !important;
+    border-color: var(--lg-border-color-strong) !important;
+    box-shadow: var(--lg-specular), var(--lg-glow) !important;
+  }
+}
+
+/* Remote / keyboard focus gets the same treatment. */
+.skip-button:focus-visible,
+#skipIntro:focus-visible,
+#skipCredits:focus-visible {
+  border-color: var(--lg-accent) !important;
+  box-shadow: var(--lg-specular), var(--lg-glow) !important;
+  outline: none;
+}
+
+/* ==========================================================================
+   PLUGIN · In-Player Episode Preview  (Namo2/InPlayerEpisodePreview)
+   --------------------------------------------------------------------------
+   DOM, from the plugin source:
+
+     #previewPopup
+       .dialogBackdrop
+       .dialogContainer > .previewPopup.actionSheet      the panel
+         .previewPopupTitle  (back arrow, h1, .previewGroupWatchedCount)
+         .previewPopupScroller
+           .previewListItem.actionSheetMenuItem          one row per episode
+             .previewItemTitle  .previewQuickActionContainer
+             .card.overflowBackdropCard.previewItemImageCard   <- thumbnail
+               .cardBox > .cardScalable > .cardImageContainer / .cardOverlayContainer
+             .previewItemDescription  .previewItemReadMoreButton
+     #popupPreviewButton                                  the player button
+
+   The thumbnails are ordinary Jellyfin cards, so they inherit the glass card
+   treatment from 06-cards.css with no extra rules. The panel has the
+   .actionSheet class and is already caught by the surface rule in
+   03-surfaces.css; here it just gets the stronger pane because it floats over
+   moving video.
+
+   The plugin pins its popup with position: fixed; bottom / left / width, and
+   locks .previewItemDetails against theme changes. None of that is touched.
+
+   Performance: the scrim is NOT blurred. A full-screen backdrop-filter over
+   playing video re-blurs every frame.
+   ========================================================================== */
+
+#previewPopup .dialogBackdrop {
+  background: rgb(0 0 0 / 0.25) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.previewPopup {
+  background: var(--lg-glass-bg-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+}
+
+.previewPopupTitle {
+  border-bottom: var(--lg-border);
+}
+
+.previewListItem {
+  border-radius: var(--lg-button-radius);
+}
+
+/* The episode that is currently playing. */
+.previewListItem.selectedListItem {
+  background-color: var(--lg-accent-soft);
+  box-shadow: var(--lg-specular), 0 0 0 1px var(--lg-accent-glow);
+}
+
+.previewGroupWatchedCount {
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill);
+  background: var(--lg-hover);
+}
+
+.previewVersionSelect {
+  background: rgb(255 255 255 / 0.08);
+  border: var(--lg-border);
+  border-radius: 10px;
+  color: var(--lg-text);
+}
+
+.previewVersionSelect option {
+  background: rgb(var(--lg-glass-tint));
+  color: #fff;
+}
+
+.previewItemReadMoreButton {
+  color: var(--lg-accent-light);
+}
+
+#popupPreviewButton {
+  border-radius: var(--lg-radius-pill);
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #popupPreviewButton:hover {
+    background-color: var(--lg-hover);
+  }
+}
+
+/* ==========================================================================
+   PLUGIN · Jellyfin Enhanced  (n00bcodr/Jellyfin-Enhanced)
+   --------------------------------------------------------------------------
+   What the plugin does that matters for theming:
+
+   - #jellyfin-enhanced-panel is built in JS with INLINE styles: position:
+     fixed, top/left 50%, transform: translate(-50%,-50%), a fixed size,
+     background rgb(24,24,24), box-shadow, border, border-radius and
+     backdropFilter. Inline styles beat any selector, so the paint properties
+     below need !important. The positioning properties (position, top, left,
+     transform, width, height, z-index, display, overflow) are NEVER set here;
+     overriding transform in particular would un-centre the panel.
+   - Its header (.panel-header) and footer (.panel-footer) carry an inline
+     background taken from the plugin's own theme detection.
+   - On narrow screens the plugin turns .je-panel-main into a solid sheet
+     (background rgb(24,24,24)); that is left alone on purpose.
+   - Seerr / Arr links in .itemExternalLinks are .button-link.emby-button
+     anchors whose icons have inline pixel sizes; nothing here resizes them.
+
+   Collisions avoided: no theme variable shares a name with the plugin's
+   (--je-*, --arr-*), and nothing here targets its generated elements by tag.
+   ========================================================================== */
+
+#jellyfin-enhanced-panel,
+#je-active-streams-panel {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-card) !important;
+  box-shadow: var(--lg-specular), var(--lg-shadow-deep) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong) !important;
+  backdrop-filter: var(--lg-filter-strong) !important;
+  color: var(--lg-text);
+}
+
+#jellyfin-enhanced-panel .panel-header,
+#jellyfin-enhanced-panel .panel-footer {
+  background: rgb(255 255 255 / 0.04) !important;
+  border-color: var(--lg-border-color) !important;
+}
+
+/* Floating "active streams" widget and its cards */
+#je-active-streams-panel .je-as-card {
+  background: rgb(255 255 255 / 0.06);
+  border: var(--lg-border);
+  border-radius: var(--lg-button-radius);
+}
+
+/* Category re-order buttons inside the settings panel */
+#jellyfin-enhanced-panel .je-cat-btn {
+  border-radius: var(--lg-radius-pill);
+}
+
+/* Header buttons the plugin injects (random item, etc.). Colour and hover
+   only: no size, margin or border changes, so the header never shifts. */
+#randomItemButton {
+  border-radius: var(--lg-radius-pill);
+  color: var(--lg-text);
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #randomItemButton:hover:not(:disabled) {
+    background-color: var(--lg-hover);
+  }
+}
+
+/* ==========================================================================
+   PLUGIN · Moonfin / Moonbase  (Moonfin-Client/Plugin)
+   --------------------------------------------------------------------------
+   What the Jellyfin plugin actually puts into the stock web client:
+
+   - A header button, .headerMoonfinButton, added next to the user icon when
+     the File Transformation plugin is installed. Its own <style> forces
+     background/border/outline/padding with !important.
+   - A dashboard sidebar entry, a[href*="configurationpage?name=Moonbase"],
+     whose Material icon is replaced by the Moonfin mark through a CSS mask
+     (background-color: currentColor + mask-image).
+   - The Moonfin web app itself is served at /Moonfin/Web/ as a separate page.
+     It is a different document, so this stylesheet is not loaded there and
+     cannot style or break it. There is no Moonfin sidebar inside Jellyfin's
+     own UI for the theme to collide with.
+
+   Rules for staying out of its way:
+   - The mask icon paints with background-color, so no rule in this theme may
+     set a background on .material-icons, .navMenuOptionIcon or .listItemIcon.
+     (None does; this note is here so it stays that way.)
+   - The header button is only recoloured, with the same !important
+     the plugin uses, and keeps its size, padding and border.
+   ========================================================================== */
+
+/* The class is doubled on purpose: it out-ranks the plugin's own !important
+   rules (specificity), whatever element type the button is. */
+@media (hover: hover) and (pointer: fine) {
+  .headerMoonfinButton.headerMoonfinButton:hover {
+    background-color: var(--lg-hover) !important;
+    opacity: 1;
+  }
+}
+
+.headerMoonfinButton.headerMoonfinButton {
+  color: var(--lg-text) !important;
+}
+
+/* ==========================================================================
+   99 · Fallbacks and user preferences
+   --------------------------------------------------------------------------
+   Loaded last so these win over everything above. Each one swaps tokens
+   rather than re-declaring rules, so every surface follows automatically.
+   ========================================================================== */
+
+/* No backdrop-filter at all (very old WebViews, some smart-TV browsers).
+   Glass without blur is just a see-through box, so make it nearly opaque.
+   Users can still tune the result with --lg-glass-fallback-opacity. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --lg-glass-fallback-opacity: 0.92;
+    --lg-glass-bg: rgb(var(--lg-glass-tint) / var(--lg-glass-fallback-opacity));
+    --lg-glass-bg-strong: rgb(var(--lg-glass-tint) / 0.97);
+  }
+}
+
+/* The OS asked for less transparency (macOS / iOS "Reduce transparency"). */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --lg-glass-bg: rgb(var(--lg-glass-tint) / 0.94);
+    --lg-glass-bg-strong: rgb(var(--lg-glass-tint) / 0.98);
+    --lg-filter: none;
+    --lg-filter-strong: none;
+    --lg-filter-scrim: none;
+  }
+}
+
+/* Transitions only. Zeroing animation-duration would make Jellyfin's infinite
+   loading spinners flicker rather than stop. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High-contrast / forced-colors modes: drop the decoration, keep the edges. */
+@media (forced-colors: active) {
+  .backgroundContainer::before {
+    display: none;
+  }
+
+  .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root,
+  .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root:not(:empty) {
+    border: 1px solid CanvasText;
+  }
+}

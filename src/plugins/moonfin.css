@@ -1,0 +1,36 @@
+/* ==========================================================================
+   PLUGIN · Moonfin / Moonbase  (Moonfin-Client/Plugin)
+   --------------------------------------------------------------------------
+   What the Jellyfin plugin actually puts into the stock web client:
+
+   - A header button, .headerMoonfinButton, added next to the user icon when
+     the File Transformation plugin is installed. Its own <style> forces
+     background/border/outline/padding with !important.
+   - A dashboard sidebar entry, a[href*="configurationpage?name=Moonbase"],
+     whose Material icon is replaced by the Moonfin mark through a CSS mask
+     (background-color: currentColor + mask-image).
+   - The Moonfin web app itself is served at /Moonfin/Web/ as a separate page.
+     It is a different document, so this stylesheet is not loaded there and
+     cannot style or break it. There is no Moonfin sidebar inside Jellyfin's
+     own UI for the theme to collide with.
+
+   Rules for staying out of its way:
+   - The mask icon paints with background-color, so no rule in this theme may
+     set a background on .material-icons, .navMenuOptionIcon or .listItemIcon.
+     (None does; this note is here so it stays that way.)
+   - The header button is only recoloured, with the same !important
+     the plugin uses, and keeps its size, padding and border.
+   ========================================================================== */
+
+/* The class is doubled on purpose: it out-ranks the plugin's own !important
+   rules (specificity), whatever element type the button is. */
+@media (hover: hover) and (pointer: fine) {
+  .headerMoonfinButton.headerMoonfinButton:hover {
+    background-color: var(--lg-hover) !important;
+    opacity: 1;
+  }
+}
+
+.headerMoonfinButton.headerMoonfinButton {
+  color: var(--lg-text) !important;
+}

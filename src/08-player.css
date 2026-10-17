@@ -1,0 +1,53 @@
+/* ==========================================================================
+   08 · Now-playing bar and video OSD
+   ========================================================================== */
+
+.nowPlayingBar {
+  background: var(--lg-glass-bg) !important;
+  border: var(--lg-border);
+  border-width: 1px 0 0 0;
+  border-radius: var(--lg-radius-card) var(--lg-radius-card) 0 0;
+  box-shadow: var(--lg-glass-shadow);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: var(--lg-text);
+}
+
+.nowPlayingBarInfoContainer,
+.nowPlayingBarCenter,
+.nowPlayingPage,
+.nowPlayingPlaylist,
+.nowPlayingInfoContainer {
+  background: transparent !important;
+}
+
+.nowPlayingImage,
+.nowPlayingBarImage {
+  border-radius: 10px;
+}
+
+.videoOsdBottom,
+.upNextContainer {
+  background: var(--lg-glass-bg-strong) !important;
+  border-top: var(--lg-border);
+  border-radius: var(--lg-radius-card) var(--lg-radius-card) 0 0;
+  box-shadow: var(--lg-glass-shadow);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+.osdHeader {
+  background: var(--lg-glass-bg-strong) !important;
+  border-bottom: var(--lg-border);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nowPlayingBar .emby-button:hover,
+  .videoOsdBottom .emby-button:hover,
+  .nowPlayingPage .emby-button:hover,
+  .osdHeader .MuiIconButton-root:hover {
+    background-color: var(--lg-hover);
+  }
+}

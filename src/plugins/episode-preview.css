@@ -1,0 +1,88 @@
+/* ==========================================================================
+   PLUGIN · In-Player Episode Preview  (Namo2/InPlayerEpisodePreview)
+   --------------------------------------------------------------------------
+   DOM, from the plugin source:
+
+     #previewPopup
+       .dialogBackdrop
+       .dialogContainer > .previewPopup.actionSheet      the panel
+         .previewPopupTitle  (back arrow, h1, .previewGroupWatchedCount)
+         .previewPopupScroller
+           .previewListItem.actionSheetMenuItem          one row per episode
+             .previewItemTitle  .previewQuickActionContainer
+             .card.overflowBackdropCard.previewItemImageCard   <- thumbnail
+               .cardBox > .cardScalable > .cardImageContainer / .cardOverlayContainer
+             .previewItemDescription  .previewItemReadMoreButton
+     #popupPreviewButton                                  the player button
+
+   The thumbnails are ordinary Jellyfin cards, so they inherit the glass card
+   treatment from 06-cards.css with no extra rules. The panel has the
+   .actionSheet class and is already caught by the surface rule in
+   03-surfaces.css; here it just gets the stronger pane because it floats over
+   moving video.
+
+   The plugin pins its popup with position: fixed; bottom / left / width, and
+   locks .previewItemDetails against theme changes. None of that is touched.
+
+   Performance: the scrim is NOT blurred. A full-screen backdrop-filter over
+   playing video re-blurs every frame.
+   ========================================================================== */
+
+#previewPopup .dialogBackdrop {
+  background: rgb(0 0 0 / 0.25) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.previewPopup {
+  background: var(--lg-glass-bg-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+}
+
+.previewPopupTitle {
+  border-bottom: var(--lg-border);
+}
+
+.previewListItem {
+  border-radius: var(--lg-button-radius);
+}
+
+/* The episode that is currently playing. */
+.previewListItem.selectedListItem {
+  background-color: var(--lg-accent-soft);
+  box-shadow: var(--lg-specular), 0 0 0 1px var(--lg-accent-glow);
+}
+
+.previewGroupWatchedCount {
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill);
+  background: var(--lg-hover);
+}
+
+.previewVersionSelect {
+  background: rgb(255 255 255 / 0.08);
+  border: var(--lg-border);
+  border-radius: 10px;
+  color: var(--lg-text);
+}
+
+.previewVersionSelect option {
+  background: rgb(var(--lg-glass-tint));
+  color: #fff;
+}
+
+.previewItemReadMoreButton {
+  color: var(--lg-accent-light);
+}
+
+#popupPreviewButton {
+  border-radius: var(--lg-radius-pill);
+  transition: background-color var(--lg-duration) var(--lg-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #popupPreviewButton:hover {
+    background-color: var(--lg-hover);
+  }
+}

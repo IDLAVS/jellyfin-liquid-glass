@@ -1,0 +1,83 @@
+/* ==========================================================================
+   00 · Design tokens
+   --------------------------------------------------------------------------
+   Everything a user may want to change lives in the "Public settings" block.
+   Override any of them from Dashboard > General > Custom CSS, AFTER the
+   @import line:
+
+     :root { --lg-blur-radius: 32px; --lg-accent-rgb: 255 159 10; }
+
+   Rules
+   - Public settings are plain values (lengths, numbers, "R G B" triplets).
+   - Derived tokens are built from them, so user overrides flow through.
+   - Colours are written as rgb(R G B / alpha) so one triplet can be tinted
+     at any opacity without color-mix().
+   ========================================================================== */
+
+:root {
+  /* ---- Public settings -------------------------------------------------- */
+
+  /* Accent colour as an "R G B" triplet (no commas, no rgb()). */
+  --lg-accent-rgb: 10 132 255;
+
+  /* Glass: tint colour ("R G B"), how opaque the pane is (0-1), blur strength. */
+  --lg-glass-tint: 20 20 26;
+  --lg-glass-opacity: 0.55;
+  --lg-blur-radius: 24px;
+  --lg-blur-saturation: 180%;
+
+  /* Shape. */
+  --lg-card-radius: 16px;
+  --lg-button-radius: 12px;
+
+  /* Wallpaper. Needs an ABSOLUTE url(); falls back to the v1 variable names. */
+  --lg-wallpaper: var(--custom-bg, var(--bgImage, none));
+  --lg-wallpaper-brightness: 0.65; /* 1 = untouched, 0 = black */
+  --lg-wallpaper-blur: 0px;
+
+  /* Header pills fade slightly on pages with a full-bleed backdrop (0-1). */
+  --lg-header-idle-opacity: 0.85;
+
+  /* Solid layer behind the Media Bar slides (stops wallpaper showing through
+     during slide cross-fades). Set to transparent to turn it off. */
+  --lg-mediabar-base: rgb(8 8 12);
+
+  --lg-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- Derived tokens (do not edit; override the settings above) -------- */
+
+  --lg-accent: rgb(var(--lg-accent-rgb));
+  --lg-accent-soft: rgb(var(--lg-accent-rgb) / 0.35);
+  --lg-accent-glow: rgb(var(--lg-accent-rgb) / 0.45);
+  --lg-accent-light: rgb(var(--lg-accent-rgb) / 0.75);
+
+  --lg-glass-bg: rgb(var(--lg-glass-tint) / var(--lg-glass-opacity));
+  --lg-glass-bg-strong: rgb(var(--lg-glass-tint) / calc(var(--lg-glass-opacity) + 0.2));
+  --lg-glass-bg-solid: rgb(var(--lg-glass-tint) / 0.96);
+  --lg-page-base: rgb(10 10 14);
+
+  --lg-filter: blur(var(--lg-blur-radius)) saturate(var(--lg-blur-saturation));
+  --lg-filter-strong: blur(calc(var(--lg-blur-radius) * 1.4)) saturate(var(--lg-blur-saturation));
+  --lg-filter-scrim: blur(calc(var(--lg-blur-radius) * 0.25));
+
+  --lg-border-color: rgb(255 255 255 / 0.14);
+  --lg-border-color-strong: rgb(255 255 255 / 0.3);
+  --lg-border: 1px solid var(--lg-border-color);
+
+  --lg-hover: rgb(255 255 255 / 0.1);
+  --lg-active: rgb(255 255 255 / 0.16);
+
+  --lg-text: rgb(255 255 255 / 0.92);
+  --lg-text-dim: rgb(255 255 255 / 0.62);
+
+  --lg-specular: inset 0 1px 1px 0 rgb(255 255 255 / 0.2);
+  --lg-shadow: 0 12px 32px rgb(0 0 0 / 0.4);
+  --lg-shadow-deep: 0 24px 56px rgb(0 0 0 / 0.55), 0 4px 12px rgb(0 0 0 / 0.3);
+  --lg-glass-shadow: var(--lg-specular), var(--lg-shadow);
+  --lg-glow: 0 0 0 1px rgb(255 255 255 / 0.22), 0 0 24px var(--lg-accent-glow);
+
+  --lg-radius-card: var(--lg-card-radius);
+  --lg-radius-pill: 9999px;
+  --lg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --lg-duration: 0.25s;
+}

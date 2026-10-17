@@ -1,0 +1,131 @@
+/* ==========================================================================
+   06 · Media cards
+   --------------------------------------------------------------------------
+   Card anatomy (from jellyfin-web's cardBuilder):
+
+     .card[data-type]
+       .cardBox                      has will-change + a transform transition
+         .cardScalable               position: relative; contain: layout style
+           .cardPadder-*  .cardImageContainer  .cardIndicators
+           .innerCardFooter  .cardOverlayContainer  .cardOverlayButton*
+         .cardFooter / .cardText
+
+   Hover ghosting (stuck lifted or enlarged cards, shadows left behind) came
+   from four things, all addressed here:
+
+   1. Two competing transforms. Jellyfin already scales a focused card
+      (.card.show-animation:focus > .cardBox { transform: scale(1.07) }) and a
+      mouse click leaves focus on the card, so the clicked card stayed
+      enlarged while the hovered one lifted. The lift now uses the independent
+      `translate` property, and the focus scale only applies to keyboard /
+      remote focus (:focus-visible).
+   2. backdrop-filter on every card and on the hidden overlay buttons. A
+      blur over an opaque poster does nothing visible, but it forces a
+      compositing layer per card and leaves stale paint behind in Chromium.
+      Cards and their overlay buttons use plain translucent fills instead.
+   3. `transition: all`. Only transform/translate/box-shadow/outline animate.
+   4. Hover styles on touch devices, which stick after a tap. Everything that
+      reacts to hover sits inside (hover: hover) and (pointer: fine).
+
+   Person (cast) cards are left alone so round avatars stay round.
+   ========================================================================== */
+
+.card:not([data-type="Person"]) .cardScalable {
+  border-radius: var(--lg-radius-card);
+  overflow: hidden;
+  background-color: var(--lg-glass-bg);
+  /* outline, not border: it does not change the card's box size */
+  outline: 1px solid var(--lg-border-color);
+  outline-offset: -1px;
+  box-shadow: var(--lg-specular);
+  transition: box-shadow 0.3s var(--lg-ease), outline-color 0.3s var(--lg-ease);
+}
+
+.card:not([data-type="Person"]) .cardImageContainer,
+.card:not([data-type="Person"]) .cardOverlayContainer {
+  border-radius: inherit;
+}
+
+/* Keep Jellyfin's own transform transition and add translate to it. */
+.card .cardBox,
+.card.show-animation .cardBox {
+  transition: transform 200ms ease-out, translate 0.3s var(--lg-ease);
+}
+
+.card .cardBox {
+  backface-visibility: hidden;
+}
+
+/* Mouse click must not leave a card enlarged. */
+.card.show-animation:focus:not(:focus-visible) > .cardBox {
+  transform: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:not([data-type="Person"]) .cardBox:hover {
+    translate: 0 -4px;
+  }
+
+  .card:not([data-type="Person"]) .cardBox:hover .cardScalable,
+  .card:not([data-type="Person"]):focus-visible .cardScalable {
+    outline-color: var(--lg-border-color-strong);
+    box-shadow:
+      var(--lg-specular),
+      0 0 0 1px rgb(255 255 255 / 0.2),
+      0 0 28px var(--lg-accent-soft),
+      0 18px 40px rgb(0 0 0 / 0.5);
+  }
+}
+
+.cardOverlayContainer {
+  background: linear-gradient(to top, rgb(0 0 0 / 0.55), transparent 60%) !important;
+}
+
+/* v12 renders the corner buttons as MUI icon buttons, older builds as
+   <button is="paper-icon-button-light">. */
+.cardOverlayButton,
+.cardOverlayButton-br .MuiIconButton-root {
+  background: rgb(var(--lg-glass-tint) / 0.72) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-specular);
+  color: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cardOverlayButton:hover,
+  .cardOverlayButton-br .MuiIconButton-root:hover {
+    background: rgb(var(--lg-glass-tint) / 0.9) !important;
+    box-shadow: var(--lg-specular), var(--lg-glow);
+  }
+}
+
+.cardText {
+  color: var(--lg-text);
+}
+
+.cardText-secondary {
+  color: var(--lg-text-dim);
+}
+
+/* Centred captions on library and detail pages (not the home rows). */
+.page:not(.homePage) .cardText {
+  text-align: center;
+}
+
+/* The main poster on an item page. */
+.detailImageContainer .cardScalable,
+.detailImageContainer .cardImageContainer {
+  border-radius: var(--lg-radius-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card .cardBox,
+  .card.show-animation .cardBox {
+    transition: none;
+  }
+
+  .card:not([data-type="Person"]) .cardBox:hover {
+    translate: none;
+  }
+}

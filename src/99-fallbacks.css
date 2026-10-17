@@ -1,0 +1,50 @@
+/* ==========================================================================
+   99 · Fallbacks and user preferences
+   --------------------------------------------------------------------------
+   Loaded last so these win over everything above. Each one swaps tokens
+   rather than re-declaring rules, so every surface follows automatically.
+   ========================================================================== */
+
+/* No backdrop-filter at all (very old WebViews, some smart-TV browsers).
+   Glass without blur is just a see-through box, so make it nearly opaque.
+   Users can still tune the result with --lg-glass-fallback-opacity. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --lg-glass-fallback-opacity: 0.92;
+    --lg-glass-bg: rgb(var(--lg-glass-tint) / var(--lg-glass-fallback-opacity));
+    --lg-glass-bg-strong: rgb(var(--lg-glass-tint) / 0.97);
+  }
+}
+
+/* The OS asked for less transparency (macOS / iOS "Reduce transparency"). */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --lg-glass-bg: rgb(var(--lg-glass-tint) / 0.94);
+    --lg-glass-bg-strong: rgb(var(--lg-glass-tint) / 0.98);
+    --lg-filter: none;
+    --lg-filter-strong: none;
+    --lg-filter-scrim: none;
+  }
+}
+
+/* Transitions only. Zeroing animation-duration would make Jellyfin's infinite
+   loading spinners flicker rather than stop. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High-contrast / forced-colors modes: drop the decoration, keep the edges. */
+@media (forced-colors: active) {
+  .backgroundContainer::before {
+    display: none;
+  }
+
+  .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root,
+  .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root:not(:empty) {
+    border: 1px solid CanvasText;
+  }
+}

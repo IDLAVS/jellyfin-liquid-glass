@@ -1,0 +1,172 @@
+/* ==========================================================================
+   05 · Controls: buttons, inputs, badges, progress, sliders
+   ========================================================================== */
+
+.button-flat,
+.emby-button,
+.raised,
+.detailButton,
+.paper-icon-button-light,
+.MuiButton-root {
+  border-radius: var(--lg-button-radius);
+  transition:
+    background-color var(--lg-duration) var(--lg-ease),
+    box-shadow var(--lg-duration) var(--lg-ease),
+    transform var(--lg-duration) var(--lg-ease);
+}
+
+/* Filled / primary buttons */
+.raised,
+.button-submit,
+.MuiButton-contained {
+  background: var(--lg-hover) !important;
+  border: var(--lg-border) !important;
+  box-shadow: var(--lg-glass-shadow) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  color: #fff !important;
+}
+
+.button-submit,
+.btnPlay.raised,
+.MuiButton-containedPrimary {
+  background: linear-gradient(180deg, var(--lg-accent-light), var(--lg-accent-soft)) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .raised:hover,
+  .button-submit:hover,
+  .MuiButton-contained:hover {
+    background-color: var(--lg-active) !important;
+    box-shadow: var(--lg-specular), var(--lg-glow) !important;
+  }
+}
+
+.emby-button:active,
+.raised:active {
+  transform: scale(0.97);
+}
+
+/* Keyboard focus: one consistent ring, MUI and legacy alike. */
+.Mui-focusVisible,
+.emby-button:focus-visible,
+.paper-icon-button-light:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+/* --- Inputs ---------------------------------------------------------------- */
+.emby-input,
+.emby-textarea,
+.emby-select,
+.MuiInputBase-root,
+.MuiOutlinedInput-root,
+.MuiFilledInput-root {
+  background: rgb(255 255 255 / 0.06) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-button-radius) !important;
+  box-shadow: var(--lg-specular);
+  color: var(--lg-text) !important;
+}
+
+.MuiFilledInput-root::before,
+.MuiFilledInput-root::after {
+  border-bottom: 0 !important;
+}
+
+.emby-input:focus,
+.emby-textarea:focus,
+.emby-select:focus {
+  border-color: var(--lg-border-color-strong) !important;
+  box-shadow: var(--lg-specular), 0 0 0 3px var(--lg-accent-soft);
+  outline: none;
+}
+
+.searchfields-txtSearch,
+.searchFields .emby-input,
+.MuiAutocomplete-root .MuiInputBase-root {
+  border-radius: var(--lg-radius-pill) !important;
+  padding-left: 1.25em !important;
+  padding-right: 1.25em !important;
+}
+
+.MuiCheckbox-root.Mui-checked,
+.MuiRadio-root.Mui-checked,
+.MuiSwitch-switchBase.Mui-checked {
+  color: var(--lg-accent);
+}
+
+.MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+  background-color: var(--lg-accent);
+}
+
+/* --- Badges and chips ------------------------------------------------------ */
+.countIndicator,
+.playedIndicator,
+.unplayedItemsIndicator,
+.mediaInfoOfficialRating,
+.mediaInfoItem,
+.mediaInfoCriticRating,
+.starRatingContainer,
+.MuiChip-root {
+  border-radius: var(--lg-radius-pill) !important;
+}
+
+/* Small, so a real blur is cheap; no nested glass inside them. */
+.countIndicator,
+.playedIndicator,
+.unplayedItemsIndicator,
+.mediaInfoOfficialRating {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular);
+  color: #fff !important;
+}
+
+/* --- Progress and sliders -------------------------------------------------- */
+.itemProgressBar,
+.itemLinearProgress.MuiLinearProgress-root {
+  overflow: hidden;
+  border-radius: var(--lg-radius-pill);
+}
+
+.itemProgressBarForeground,
+.itemLinearProgress .MuiLinearProgress-bar {
+  background: linear-gradient(90deg, var(--lg-accent), var(--lg-accent-light)) !important;
+  border-radius: var(--lg-radius-pill);
+}
+
+.mdl-slider-background-flex,
+.mdl-slider-background-lower,
+.mdl-slider-background-upper {
+  border-radius: var(--lg-radius-pill);
+}
+
+.mdl-slider-background-upper {
+  background: rgb(255 255 255 / 0.18) !important;
+}
+
+.mdl-slider-background-lower {
+  background: linear-gradient(90deg, var(--lg-accent), var(--lg-accent-light)) !important;
+}
+
+.mdl-slider::-webkit-slider-thumb {
+  background: #fff !important;
+  border: 0;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.5), 0 0 0 4px rgb(255 255 255 / 0.18);
+}
+
+.mdl-slider::-moz-range-thumb {
+  background: #fff !important;
+  border: 0;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.5), 0 0 0 4px rgb(255 255 255 / 0.18);
+}
+
+.sliderBubble {
+  background: var(--lg-glass-bg-strong) !important;
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-glass-shadow);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}

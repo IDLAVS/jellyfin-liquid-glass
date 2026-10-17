@@ -1,0 +1,18 @@
+/* Import manifest. Order matters: later files win ties on specificity.
+   scripts/build.mjs inlines these into the root theme.css; you can also point
+   a dev server at this file to work on the partials directly. */
+@import url("./00-tokens.css");
+@import url("./01-base.css");
+@import url("./02-backdrop.css");
+@import url("./03-surfaces.css");
+@import url("./04-header.css");
+@import url("./05-controls.css");
+@import url("./06-cards.css");
+@import url("./07-detail.css");
+@import url("./08-player.css");
+@import url("./plugins/media-bar.css");
+@import url("./plugins/intro-skipper.css");
+@import url("./plugins/episode-preview.css");
+@import url("./plugins/jellyfin-enhanced.css");
+@import url("./plugins/moonfin.css");
+@import url("./99-fallbacks.css");

@@ -1,0 +1,78 @@
+/* ==========================================================================
+   PLUGIN · Media Bar  (IAmParadox27/jellyfin-plugin-media-bar)
+   --------------------------------------------------------------------------
+   Selectors come from the plugin's own stylesheet (slideshowpure.css):
+   #slides-container > .slide > .backdrop-container / .slide-content / ...
+
+   Alignment with the header
+   The plugin measures where the page starts and publishes it as
+   --slideshow-page-offset, then positions #slides-container and
+   .homeSectionsContainer from that. The theme therefore must not change the
+   top margin/padding of the page or the header spacer, and it does not. (The
+   old GlassFin workaround  #slides-container { top: calc(-1 * var(--appBarHeight)) }
+   double-counts the offset on Jellyfin 12 and is intentionally not carried over.)
+
+   Wallpaper bleed-through
+   Slides cross-fade by opacity. At the midpoint two half-transparent slides
+   leave ~25% of whatever is behind them visible, and a slide that is still
+   loading (.awaiting-image / .image-failed) is fully transparent. Behind the
+   slides we put a solid base that uses the plugin's own bottom-fade mask, so
+   the wallpaper never shows through the bar but still blends into the page
+   below it. If a Media Bar layout wants the page visible inside the bar, set
+   --lg-mediabar-base: transparent.
+
+   Geometry (size, position, margin, padding) is never touched here.
+   ========================================================================== */
+
+#slides-container {
+  isolation: isolate;
+}
+
+#slides-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--lg-mediabar-base);
+  -webkit-mask-image: var(--slideshow-bottom-fade, linear-gradient(to bottom, #000 70%, transparent 100%));
+  mask-image: var(--slideshow-bottom-fade, linear-gradient(to bottom, #000 70%, transparent 100%));
+  pointer-events: none;
+}
+
+/* Action buttons: glass pills. */
+#slides-container :is(.play-button, .detail-button, .favorite-button, .trailer-button) {
+  background-color: rgb(var(--lg-glass-tint) / 0.45);
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  transition:
+    background-color var(--lg-duration) var(--lg-ease),
+    box-shadow var(--lg-duration) var(--lg-ease),
+    border-color var(--lg-duration) var(--lg-ease);
+}
+
+#slides-container .play-button {
+  background-image: linear-gradient(180deg, var(--lg-accent-light), var(--lg-accent-soft));
+}
+
+/* Arrows and pause / mute: glass circles. */
+#slides-container :is(.arrow, .pause-button, .mute-button, .volume-toggle) {
+  background-color: rgb(var(--lg-glass-tint) / 0.45);
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+#slides-container .dot.active {
+  background-color: var(--lg-accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #slides-container :is(.play-button, .detail-button, .favorite-button, .trailer-button, .arrow, .pause-button, .mute-button, .volume-toggle):hover {
+    background-color: rgb(var(--lg-glass-tint) / 0.7);
+    border-color: var(--lg-border-color-strong);
+    box-shadow: var(--lg-specular), var(--lg-glow);
+  }
+}
