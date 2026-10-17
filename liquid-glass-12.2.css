@@ -1,7 +1,7 @@
 /*
  * Liquid Glass for Jellyfin 12.2
  * Load via Dashboard > General > Custom CSS:
- *   @import url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.2.0/liquid-glass-12.2.css");
+ *   @import url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.0/liquid-glass-12.2.css");
  *
  * Wallpaper is NOT part of this file. Add your own after the @import:
  *   :root { --custom-bg: url('https://cdn.jsdelivr.net/gh/<user>/<repo>@main/<image>.jpg'); }
@@ -611,9 +611,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 
 .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root,
 .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root:not(:empty),
-.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiButton-root,
-.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root .MuiChip-root,
-.MuiAppBar-root .MuiButtonGroup-root {
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiButton-root {
   background: var(--lg-surface);
   border: var(--lg-border);
   border-radius: var(--lg-radius-pill);
@@ -683,6 +681,17 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
   background: var(--lg-surface-hover);
 }
 
+/* The user avatar is 40px by default; shrink it so it matches the other icons */
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root .MuiIconButton-root[aria-controls="app-user-menu"] {
+  padding: 4px;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root .MuiAvatar-root {
+  width: 28px;
+  height: 28px;
+  font-size: 1rem;
+}
+
 /* Wide screens: nav pill centered between the left controls and icon pill */
 @media (min-width: 1200px) {
   .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root {
@@ -697,10 +706,11 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 
 /* ==========================================================================
    13. Library pages (Movies, TV Shows, ...)
+   Row 2 is a tab pill (the views menu shown inline) with a flat controls row.
    ========================================================================== */
 .MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root {
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiButton-root {
@@ -724,44 +734,139 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 
 .MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiStack-root {
   flex-grow: 0 !important;
+  align-items: center;
   justify-content: center;
 }
 
+/* Item count: plain text */
 .MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root .MuiChip-root {
-  height: 38px;
+  height: auto;
+  background: none;
+  border: 0;
+  box-shadow: none;
   color: var(--lg-text);
+  font-size: 1.05rem;
   font-weight: 500;
 }
 
+/* Control buttons: flat icons in the order GlassFin uses
+   (arrows, play, shuffle, then view / sort / filter) */
 .MuiAppBar-root .MuiButtonGroup-root {
-  overflow: hidden;
+  background: none;
+  border: 0;
+  box-shadow: none;
 }
 
 .MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root {
+  width: 40px;
   min-width: 40px;
-  height: 38px;
+  height: 40px;
+  padding: 0;
   border: 0 !important;
-  border-radius: 0 !important;
+  border-radius: 50% !important;
   background: transparent !important;
   box-shadow: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
   color: var(--lg-text) !important;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
+  font-size: 0;
 }
 
-.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root + .MuiButton-root {
-  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root .MuiButton-startIcon {
+  margin: 0;
 }
 
 .MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root:hover {
   background: var(--lg-surface-hover) !important;
 }
 
-.MuiAppBar-root .MuiButtonGroup-contained > .MuiButton-root:first-child {
-  background: color-mix(in srgb, var(--apple-accent) 55%, transparent) !important;
+.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root:disabled {
+  opacity: 0.35;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiStack-root > .MuiBox-root {
+  order: 2;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiStack-root > .MuiButtonGroup-root {
+  order: 3;
+  flex-direction: row-reverse;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiStack-root > .MuiButtonGroup-root:last-child {
+  order: 1;
+  flex-direction: row;
+}
+
+/* Wide screens: the library views menu becomes a centered tab pill.
+   Jellyfin keeps this menu mounted (hidden); we simply show it in place. */
+@media (min-width: 1200px) {
+  .MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root {
+    min-height: 0;
+    margin-top: 56px;
+  }
+
+  .MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiButton-root {
+    display: none;
+  }
+
+  #library-view-menu {
+    visibility: visible !important;
+    position: fixed !important;
+    top: 52px !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+    height: auto !important;
+    transform: translateX(-50%);
+    z-index: 1101 !important;
+    pointer-events: none;
+  }
+
+  #library-view-menu .MuiBackdrop-root {
+    display: none !important;
+  }
+
+  #library-view-menu .MuiPopover-paper {
+    position: static !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 3px;
+    border-radius: var(--lg-radius-pill) !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    transform: none !important;
+    transition: none !important;
+    visibility: visible !important;
+    pointer-events: auto;
+  }
+
+  #library-view-menu .MuiList-root {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    padding: 0;
+  }
+
+  #library-view-menu .MuiMenuItem-root {
+    min-height: 38px;
+    margin: 0 !important;
+    padding: 4px 22px;
+    border-radius: var(--lg-radius-pill);
+    color: var(--lg-text);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  #library-view-menu .MuiMenuItem-root.Mui-selected {
+    background: var(--lg-surface-active) !important;
+    box-shadow: var(--lg-specular);
+    color: #fff;
+    font-weight: 600;
+  }
 }
 
 /* A-Z picker: a slim vertical pill */
@@ -796,11 +901,11 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 }
 
 /* ==========================================================================
-   14. Item detail pages (desktop): full-bleed backdrop, centered content
+   14. Item detail pages (desktop): full-screen backdrop, centered content
    ========================================================================== */
 .layout-desktop .itemDetailPage .itemBackdrop {
-  height: 80vh;
-  min-height: 520px;
+  height: 100vh;
+  min-height: 640px;
   margin-top: -48px;
 }
 
@@ -811,10 +916,10 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    rgba(10, 10, 14, 0.55) 0%,
-    rgba(10, 10, 14, 0) 18%,
-    rgba(10, 10, 14, 0) 38%,
-    rgba(10, 10, 14, 0.78) 78%,
+    rgba(10, 10, 14, 0.5) 0%,
+    rgba(10, 10, 14, 0) 16%,
+    rgba(10, 10, 14, 0) 45%,
+    rgba(10, 10, 14, 0.8) 78%,
     rgb(10, 10, 14) 100%
   );
 }
@@ -832,9 +937,9 @@ body:has(.itemDetailPage:not(.hide)) .backgroundContainer:not(.withBackdrop) {
 .layout-desktop .itemDetailPage .detailLogo {
   left: 50%;
   right: auto;
-  top: calc(80vh - 24vh - 16.5em);
+  top: calc(100vh - 29em - 28vh - 48px);
   width: min(60vw, 780px);
-  height: 24vh;
+  height: 28vh;
   transform: translateX(-50%);
   background-position: center bottom;
   filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.5));
@@ -844,12 +949,18 @@ body:has(.itemDetailPage:not(.hide)) .backgroundContainer:not(.withBackdrop) {
   display: none;
 }
 
+/* Pull the info block up over the bottom of the backdrop */
+.layout-desktop .itemDetailPage .detailPageWrapperContainer {
+  position: relative;
+  margin-top: -26em;
+}
+
 .layout-desktop .itemDetailPage .detailRibbon {
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: auto;
-  margin-top: -13em;
+  margin-top: 0;
   padding: 0 5vw !important;
   background: transparent !important;
   text-align: center;
@@ -872,47 +983,80 @@ body:has(.itemDetailPage:not(.hide)) .backgroundContainer:not(.withBackdrop) {
 
 .layout-desktop .itemDetailPage .itemMiscInfo {
   justify-content: center;
+  font-size: 1.05rem;
 }
 
 .layout-desktop .itemDetailPage .mediaInfoOfficialRating {
-  border-radius: var(--lg-radius-pill);
-  padding: 0.1em 0.7em;
+  padding: 0.05em 0.6em;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 6px;
+  background: transparent;
 }
 
+.layout-desktop .itemDetailPage .starIcon {
+  color: color-mix(in srgb, var(--apple-accent) 60%, #fff);
+}
+
+/* Buttons: flat icons, with an outlined pill for Play */
 .layout-desktop .itemDetailPage .mainDetailButtons {
   justify-content: center;
-  gap: 10px;
+  gap: 6px;
   margin: 0.6em 0 0;
 }
 
 .layout-desktop .itemDetailPage .detailButton {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   margin: 0;
-  padding: 0;
-  border: var(--lg-border);
+  padding: 0 !important;
+  border: 0;
   border-radius: 50% !important;
-  background: var(--lg-surface);
-  box-shadow: var(--lg-glass-shadow);
+  background: none;
+  box-shadow: none;
   color: var(--lg-text);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.layout-desktop .itemDetailPage .detailButton:hover {
+  background: var(--lg-surface-hover);
+}
+
+.layout-desktop .itemDetailPage .btnPlay {
+  flex-direction: row;
+  width: auto;
+  padding: 0 22px !important;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--lg-radius-pill) !important;
+  background: rgba(255, 255, 255, 0.06);
   -webkit-backdrop-filter: var(--lg-blur);
   backdrop-filter: var(--lg-blur);
 }
 
-.layout-desktop .itemDetailPage .detailButton:hover {
+.layout-desktop .itemDetailPage .btnPlay:hover {
+  border-color: rgba(255, 255, 255, 0.7);
   background: var(--lg-surface-active);
-  box-shadow: var(--lg-specular), var(--lg-glow);
+  box-shadow: var(--lg-glow);
 }
 
-.layout-desktop .itemDetailPage .btnPlay {
-  background: color-mix(in srgb, var(--apple-accent) 55%, transparent);
+.layout-desktop .itemDetailPage .btnPlay::after {
+  content: attr(title);
+  margin-left: 8px;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .layout-desktop .itemDetailPage .detailPagePrimaryContent {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 1.25em 5vw 0 !important;
+  max-width: none;
+  margin: 0;
+  padding: 1.25em 4vw 0 !important;
   text-align: center;
+}
+
+.layout-desktop .itemDetailPage .overview {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 .layout-desktop .itemDetailPage .trackSelections {
@@ -922,12 +1066,12 @@ body:has(.itemDetailPage:not(.hide)) .backgroundContainer:not(.withBackdrop) {
 .layout-desktop .itemDetailPage .itemExternalLinks a {
   display: inline-block;
   margin: 0 4px;
-  padding: 0.25em 0.9em;
-  border: var(--lg-border);
-  border-radius: var(--lg-radius-pill);
-  background: var(--lg-surface);
-  box-shadow: var(--lg-specular);
+  padding: 0.3em 0.9em;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
   color: var(--lg-text);
+  font-size: 0.95rem;
 }
 
 /* ==========================================================================

@@ -19,8 +19,9 @@
 - **12.x backdrop handling**: the dynamic backdrop is suppressed on the home screen and kept, softly masked, on item detail pages, so backdrops don't stack on top of your wallpaper.
 - **High-blur media cards**: rounded glass cards that lift on hover with a glowing edge.
 - **Bring your own wallpaper**: the theme ships without a background image. You add a short snippet with a link to your favorite image (see below).
-- **Floating glass header**: no full-width bar. The nav is a centered glass pill, the icon buttons are a joined pill on the right, and the Movies/TV controls are centered pills underneath.
-- **Movies, TV and detail pages**: rounded bordered posters with centered captions, a slim glass A-Z pill, and a full-bleed backdrop on item pages with a centered logo, info, buttons and overview (desktop).
+- **Floating glass header**: no full-width bar. The nav is a centered glass pill and the icon buttons are a joined pill on the right.
+- **Tab pill on library pages**: on screens 1200px and wider, the Movies/TV views (Suggestions, Favorites, Collections, Genres) appear as a centered tab pill with a flat icon row underneath.
+- **Movies, TV and detail pages**: rounded bordered posters with centered captions, a slim glass A-Z pill, and a full-screen backdrop on item pages with a centered logo, info, buttons and overview (desktop).
 - **Layout-safe**: the theme only changes visuals. It does not touch `display`, `position`, `height` or margins of Jellyfin's page containers, and it does not style the Media Bar at all.
 - **System fonts only**: `-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif`. No web fonts are loaded.
 
@@ -43,7 +44,7 @@
 3. Paste the following snippet:
 
    ```css
-   @import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.2.0/liquid-glass-12.2.css');
+   @import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.0/liquid-glass-12.2.css');
    ```
 
 4. Click **Save**, then hard-refresh your browser (`Ctrl+Shift+R`, or `Cmd+Shift+R` on macOS).
@@ -55,7 +56,7 @@ Without a wallpaper you get a plain dark background. To add your own, continue b
 The wallpaper is not part of the theme. Copy this small snippet **below** the `@import` line and replace the link with your image:
 
 ```css
-@import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.2.0/liquid-glass-12.2.css');
+@import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.0/liquid-glass-12.2.css');
 
 :root {
     --custom-bg: url('https://cdn.jsdelivr.net/gh/YOUR-USER/YOUR-REPO@main/your-image.jpg');
@@ -84,7 +85,7 @@ jsDelivr serves files up to 50 MB. A 3840×2160 JPEG at roughly 80% quality is u
 Override any variable in the same **Custom CSS** box. Put your overrides **after** the `@import` line so they take precedence.
 
 ```css
-@import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.2.0/liquid-glass-12.2.css');
+@import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.0/liquid-glass-12.2.css');
 
 :root {
     /* Your wallpaper */
@@ -107,7 +108,7 @@ Override any variable in the same **Custom CSS** box. Put your overrides **after
 
 ## 📝 Notes on the Jellyfin 12.2 layout
 
-- In Jellyfin 12.2 the library views (Suggestions, Favorites, Collections, Genres) are a dropdown behind the **Movies ▾** button, not a tab strip. CSS cannot turn a menu into tabs, so the button is styled as a glass pill instead.
+- In Jellyfin 12.2 the library views (Suggestions, Favorites, Collections, Genres) are a dropdown menu. On screens 1200px and wider the theme reveals that menu in place as a tab pill (it is the same menu, so clicking works as normal). Below 1200px the header wraps and the dropdown button is shown as a pill instead.
 - On desktop item pages the poster is hidden and the logo replaces the title (episodes keep their title). The wallpaper is replaced by solid dark on item pages so the backdrop fades out cleanly.
 - The header and page design is inspired by [GlassFin](https://github.com/KBH-Reeper/GlassFin). No GlassFin code is used here.
 
@@ -132,7 +133,7 @@ jsDelivr caches `@main` for up to 12 hours, and **browsers cache it for up to 7 
 curl -i https://purge.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@main/liquid-glass-12.2.css
 ```
 
-Replace `IDLAVS/jellyfin-liquid-glass` with your own `user/repo` if you forked the theme. A response with `"status": "finished"` means the purge worked. Then hard-refresh Jellyfin. That is why the install snippet pins a release tag (`@v1.2.0`): a tag never changes, so you always get exactly that version. To update, change the tag in your snippet to the newest one under [Releases](https://github.com/IDLAVS/jellyfin-liquid-glass/tags).
+Replace `IDLAVS/jellyfin-liquid-glass` with your own `user/repo` if you forked the theme. A response with `"status": "finished"` means the purge worked. Then hard-refresh Jellyfin. That is why the install snippet pins a release tag (`@v1.3.0`): a tag never changes, so you always get exactly that version. To update, change the tag in your snippet to the newest one under [Releases](https://github.com/IDLAVS/jellyfin-liquid-glass/tags).
 
 ## 📄 License
 
