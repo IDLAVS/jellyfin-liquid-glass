@@ -18,15 +18,15 @@
 - **Apple Liquid Glass aesthetic**: translucent surfaces, deep frosted blur, crisp 1px edge borders and inner specular highlights on the header, drawer, dialogs, cards and player.
 - **12.x backdrop handling**: the dynamic backdrop is suppressed on the home screen and kept, softly masked, on item detail pages, so backdrops don't stack on top of your wallpaper.
 - **High-blur media cards**: rounded glass cards that lift on hover with a glowing edge.
-- **Custom background support**: the wallpaper is a single CSS variable. Point it at any image.
-- **Layout-safe**: the theme only changes visuals. It does not touch `display`, `position`, `height` or margins of Jellyfin's page containers or the Media Bar.
+- **Bring your own wallpaper**: the theme ships without a background image. You add a short snippet with a link to your favorite image (see below).
+- **Layout-safe**: the theme only changes visuals. It does not touch `display`, `position`, `height` or margins of Jellyfin's page containers, and it does not style the Media Bar at all.
 - **System fonts only**: `-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif`. No web fonts are loaded.
 
 ## 🔌 Compatibility
 
 | Plugin | Status | What the theme does |
 | --- | --- | --- |
-| [Media Bar](https://github.com/IAmParadox27/jellyfin-plugin-media-bar) | ✅ Styled | Preserved top flow: layout properties are untouched. Adds 18px rounded edges and soft side vignettes. |
+| [Media Bar](https://github.com/IAmParadox27/jellyfin-plugin-media-bar) | ✅ Left alone | Preserved top flow: the theme adds no rules for `#slides-container`, so the plugin controls its own layout. |
 | [Jellyfin Enhanced](https://github.com/n00bcodr/Jellyfin-Enhanced) | ✅ Styled | Panels, drawers and modals use the translucent glass palette. |
 | [Moonfin](https://github.com/Moonfin-Client) | ✅ Styled | Sidebars and drawers use the translucent glass palette. |
 | [Intro Skipper](https://github.com/intro-skipper/intro-skipper) | ✅ Styled | Floating glass pill skip buttons with a glowing hover border. |
@@ -46,15 +46,46 @@
 
 4. Click **Save**, then hard-refresh your browser (`Ctrl+Shift+R`, or `Cmd+Shift+R` on macOS).
 
-## 🎛️ Customization
+Without a wallpaper you get a plain dark background. To add your own, continue below.
 
-Override any variable in the same **Custom CSS** box, **after** the `@import` line. Later rules win, so your values replace the theme's defaults without editing the stylesheet.
+## 🖼️ Add your own wallpaper
+
+The wallpaper is not part of the theme. Copy this small snippet **below** the `@import` line and replace the link with your image:
 
 ```css
 @import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@main/liquid-glass-12.2.css');
 
 :root {
-    /* Override default background with your own image */
+    --custom-bg: url('https://cdn.jsdelivr.net/gh/YOUR-USER/YOUR-REPO@main/your-image.jpg');
+}
+```
+
+### Getting a link from a GitHub repo
+
+Use a direct image link, not the normal GitHub page link (`github.com/.../blob/...` is an HTML page and will not load as a background).
+
+| Link type | Format |
+| --- | --- |
+| jsDelivr (recommended) | `https://cdn.jsdelivr.net/gh/USER/REPO@BRANCH/path/to/image.jpg` |
+| GitHub raw | `https://raw.githubusercontent.com/USER/REPO/BRANCH/path/to/image.jpg` |
+
+Example: an image at `github.com/IDLAVS/jellyfin-assets/blob/main/blackandwhite3840x2160.jpg` becomes
+
+```css
+--custom-bg: url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/blackandwhite3840x2160.jpg');
+```
+
+jsDelivr serves files up to 50 MB. A 3840×2160 JPEG at roughly 80% quality is usually well under that and looks sharp on 4K screens.
+
+## 🎛️ Customization
+
+Override any variable in the same **Custom CSS** box. Put your overrides **after** the `@import` line so they take precedence.
+
+```css
+@import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@main/liquid-glass-12.2.css');
+
+:root {
+    /* Your wallpaper */
     --custom-bg: url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/blackandwhite3840x2160.jpg');
 
     /* Optional: Adjust glass blur strength */
@@ -66,11 +97,24 @@ Override any variable in the same **Custom CSS** box, **after** the `@import` li
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `--custom-bg` | `url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/blackandwhite3840x2160.jpg')` | Wallpaper image, rendered fixed and covering the viewport. |
+| `--custom-bg` | not set (plain dark background) | Wallpaper image, rendered fixed and covering the viewport. Use `url('...')`. |
 | `--glass-blur` | `blur(24px) saturate(180%)` | The `backdrop-filter` applied to every glass surface. |
 | `--card-radius` | `16px` | Corner radius of cards, dialogs and panels. Buttons (12px) and pills (9999px) are fixed. |
 | `--apple-accent` | `#0a84ff` | Accent color for primary buttons, focus rings, progress bars and sliders. |
 | `--glass-base` | `rgba(20, 20, 26, 0.55)` | Translucent base color of glass surfaces. Raise the alpha for more opaque panels. |
+
+## 🛠️ Troubleshooting
+
+**The Media Bar is in the middle of the page and I have to scroll to see it.**
+The theme does not style or position the Media Bar, so first find out whether the theme is involved:
+
+1. Temporarily remove the `@import` line from Custom CSS, save, and hard-refresh. If the Media Bar is still low, the cause is the plugin or another Custom CSS block. Check for leftover Media Bar CSS (for example `#slides-container { margin-top: -50vw; }` or `.homeSectionsContainer { top: ... }`) and remove it. Recent plugin versions load their own CSS and need none of that.
+2. If the Media Bar is fine without the theme, [open an issue](https://github.com/IDLAVS/jellyfin-liquid-glass/issues) and include the output of this snippet, run in the browser console on the home page:
+
+   ```js
+   const c = document.querySelector('#slides-container');
+   console.log(getComputedStyle(c).position, c.getBoundingClientRect().top, getComputedStyle(c).marginTop, innerHeight);
+   ```
 
 ## 🧹 Clearing the jsDelivr cache
 

@@ -3,17 +3,19 @@
  * Load via Dashboard > General > Custom CSS:
  *   @import url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@main/liquid-glass-12.2.css");
  *
+ * Wallpaper is NOT part of this file. Add your own after the @import:
+ *   :root { --custom-bg: url('https://cdn.jsdelivr.net/gh/<user>/<repo>@main/<image>.jpg'); }
+ * Without it you get a plain dark background.
+ *
  * Layout rule: this file never changes display, position, flex-direction,
- * height or margins of .mainAnimatedPages, .page, #mediaBar, .mediaBar or
- * .homeSectionsContainer. Plugin rules below are visual-only.
+ * height or margins of .mainAnimatedPages, .page or .homeSectionsContainer,
+ * and it does not style the Media Bar plugin (#slides-container) at all.
  */
 
 /* ==========================================================================
    1. Design tokens
    ========================================================================== */
 :root {
-  --custom-bg: url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/blackandwhite3840x2160.jpg');
-
   --lg-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 
   /* Public, user-tunable variables */
@@ -83,7 +85,8 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -2;
-  background-image: var(--custom-bg);
+  background-color: #0b0b0f;
+  background-image: var(--custom-bg, none);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -493,51 +496,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 }
 
 /* ==========================================================================
-   9. Plugin: Media Bar (visual-only; no layout properties)
-   ========================================================================== */
-#mediaBar,
-.mediaBar,
-#slides-container,
-.slides-container {
-  border-radius: var(--lg-radius-carousel);
-  clip-path: inset(0 round var(--lg-radius-carousel));
-  box-shadow: var(--lg-glass-shadow);
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
-}
-
-#mediaBar .slide,
-.mediaBar .slide,
-#slides-container .slide,
-.slides-container .slide {
-  border-radius: var(--lg-radius-carousel);
-}
-
-#mediaBar .slide-button,
-#mediaBar .btn-play,
-.mediaBar .slide-button,
-.mediaBar .btn-play,
-#slides-container .slide-button,
-#slides-container .btn-play {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border: var(--lg-border) !important;
-  border-radius: var(--lg-radius-button) !important;
-  box-shadow: var(--lg-specular);
-  -webkit-backdrop-filter: var(--lg-blur);
-  backdrop-filter: var(--lg-blur);
-}
-
-#mediaBar .slide-button:hover,
-#mediaBar .btn-play:hover,
-.mediaBar .slide-button:hover,
-.mediaBar .btn-play:hover,
-#slides-container .slide-button:hover,
-#slides-container .btn-play:hover {
-  box-shadow: var(--lg-specular), var(--lg-glow);
-}
-
-/* ==========================================================================
-   10. Plugin: Intro Skipper
+   9. Plugin: Intro Skipper
    ========================================================================== */
 #skipIntro,
 #skipCredits,
@@ -570,7 +529,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 }
 
 /* ==========================================================================
-   11. Plugin: In-Player Episode Preview / scrubbing thumbnails
+   10. Plugin: In-Player Episode Preview / scrubbing thumbnails
    ========================================================================== */
 .episodePreview,
 .episode-preview,
@@ -599,7 +558,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 }
 
 /* ==========================================================================
-   12. Plugins: Jellyfin Enhanced and Moonfin
+   11. Plugins: Jellyfin Enhanced and Moonfin
    ========================================================================== */
 #jellyfin-enhanced-panel,
 .jellyfin-enhanced-panel,
@@ -644,7 +603,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 }
 
 /* ==========================================================================
-   13. Scrollbars, lists, accessibility
+   12. Scrollbars, lists, accessibility
    ========================================================================== */
 * {
   scrollbar-width: thin;
