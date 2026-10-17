@@ -44,7 +44,7 @@
 3. Paste the following snippet:
 
    ```css
-   @import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.0/liquid-glass-12.2.css');
+   @import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.1/liquid-glass-12.2.css');
    ```
 
 4. Click **Save**, then hard-refresh your browser (`Ctrl+Shift+R`, or `Cmd+Shift+R` on macOS).
@@ -56,7 +56,7 @@ Without a wallpaper you get a plain dark background. To add your own, continue b
 The wallpaper is not part of the theme. Copy this small snippet **below** the `@import` line and replace the link with your image:
 
 ```css
-@import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.0/liquid-glass-12.2.css');
+@import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.1/liquid-glass-12.2.css');
 
 :root {
     --custom-bg: url('https://cdn.jsdelivr.net/gh/YOUR-USER/YOUR-REPO@main/your-image.jpg');
@@ -85,7 +85,7 @@ jsDelivr serves files up to 50 MB. A 3840×2160 JPEG at roughly 80% quality is u
 Override any variable in the same **Custom CSS** box. Put your overrides **after** the `@import` line so they take precedence.
 
 ```css
-@import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.0/liquid-glass-12.2.css');
+@import url('https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.3.1/liquid-glass-12.2.css');
 
 :root {
     /* Your wallpaper */
@@ -133,7 +133,7 @@ jsDelivr caches `@main` for up to 12 hours, and **browsers cache it for up to 7 
 curl -i https://purge.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@main/liquid-glass-12.2.css
 ```
 
-Replace `IDLAVS/jellyfin-liquid-glass` with your own `user/repo` if you forked the theme. A response with `"status": "finished"` means the purge worked. Then hard-refresh Jellyfin. That is why the install snippet pins a release tag (`@v1.3.0`): a tag never changes, so you always get exactly that version. To update, change the tag in your snippet to the newest one under [Releases](https://github.com/IDLAVS/jellyfin-liquid-glass/tags).
+Replace `IDLAVS/jellyfin-liquid-glass` with your own `user/repo` if you forked the theme. A response with `"status": "finished"` means the purge worked. Then hard-refresh Jellyfin. That is why the install snippet pins a release tag (`@v1.3.1`): a tag never changes, so you always get exactly that version. To update, change the tag in your snippet to the newest one under [Releases](https://github.com/IDLAVS/jellyfin-liquid-glass/tags).
 
 ## 📄 License
 
