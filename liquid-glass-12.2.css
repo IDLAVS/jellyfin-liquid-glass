@@ -1,7 +1,7 @@
 /*
  * Liquid Glass for Jellyfin 12.2
  * Load via Dashboard > General > Custom CSS:
- *   @import url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.1.0/liquid-glass-12.2.css");
+ *   @import url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@v1.2.0/liquid-glass-12.2.css");
  *
  * Wallpaper is NOT part of this file. Add your own after the @import:
  *   :root { --custom-bg: url('https://cdn.jsdelivr.net/gh/<user>/<repo>@main/<image>.jpg'); }
@@ -120,7 +120,6 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
    4. Glass surfaces: header, drawer, cards, now playing bar
    ========================================================================== */
 .skinHeader,
-.MuiAppBar-root,
 .mainDrawer,
 .MuiDrawer-paper,
 .cardScalable,
@@ -133,13 +132,11 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
   color: var(--lg-text);
 }
 
-.skinHeader,
-.MuiAppBar-root {
+.skinHeader {
   border-width: 0 0 1px 0;
 }
 
-.skinHeader.semiTransparent,
-.MuiAppBar-root.MuiAppBar-colorTransparent {
+.skinHeader.semiTransparent {
   background: rgba(20, 20, 26, 0.4) !important;
 }
 
@@ -599,7 +596,342 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 }
 
 /* ==========================================================================
-   12. Scrollbars, lists, accessibility
+   12. Header: detached glass bubbles
+   The AppBar itself is invisible; the nav group and the icon group float as
+   separate glass pills. Heights stay <= 48px so Jellyfin's layout is unchanged.
+   ========================================================================== */
+.MuiAppBar-root {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root,
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root:not(:empty),
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiButton-root,
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root .MuiChip-root,
+.MuiAppBar-root .MuiButtonGroup-root {
+  background: var(--lg-surface);
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill);
+  box-shadow: var(--lg-glass-shadow);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+}
+
+/* Nav pill */
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root {
+  align-items: center;
+  padding: 3px;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root > .MuiButton-root {
+  min-height: 38px;
+  padding: 4px 14px;
+  border-radius: var(--lg-radius-pill) !important;
+  color: var(--lg-text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root > .MuiButton-root:hover {
+  background: var(--lg-surface-hover);
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root > .MuiButton-colorPrimary,
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root > .MuiButton-textPrimary {
+  background: var(--lg-surface-active);
+  box-shadow: var(--lg-specular);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Icon pill: the two icon boxes are joined into one pill */
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root {
+  flex-grow: 0 !important;
+  align-items: center;
+  padding: 3px;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root ~ .MuiBox-root:not(:empty) {
+  margin-left: auto;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root:not(:empty) + .MuiBox-root:not(:empty) {
+  margin-left: 0;
+  border-left-width: 0;
+  border-radius: 0 var(--lg-radius-pill) var(--lg-radius-pill) 0;
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root:not(:empty):has(+ .MuiBox-root:not(:empty)) {
+  border-right-width: 0;
+  border-radius: var(--lg-radius-pill) 0 0 var(--lg-radius-pill);
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root .MuiIconButton-root {
+  padding: 7px;
+  color: var(--lg-text);
+}
+
+.MuiAppBar-root > .MuiToolbar-root:first-child > .MuiBox-root .MuiIconButton-root:hover {
+  background: var(--lg-surface-hover);
+}
+
+/* Wide screens: nav pill centered between the left controls and icon pill */
+@media (min-width: 1200px) {
+  .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .MuiAppBar-root > .MuiToolbar-root:first-child > .MuiStack-root ~ .MuiBox-root:not(:empty) {
+    margin-left: 0;
+  }
+}
+
+/* ==========================================================================
+   13. Library pages (Movies, TV Shows, ...)
+   ========================================================================== */
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root {
+  justify-content: center;
+  gap: 8px;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiButton-root {
+  min-height: 38px;
+  padding: 0 16px;
+  color: var(--lg-text);
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root .MuiTypography-h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiBox-root {
+  flex-grow: 0 !important;
+  margin-left: 0 !important;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root > .MuiStack-root {
+  flex-grow: 0 !important;
+  justify-content: center;
+}
+
+.MuiAppBar-root > .MuiToolbar-root + .MuiToolbar-root .MuiChip-root {
+  height: 38px;
+  color: var(--lg-text);
+  font-weight: 500;
+}
+
+.MuiAppBar-root .MuiButtonGroup-root {
+  overflow: hidden;
+}
+
+.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root {
+  min-width: 40px;
+  height: 38px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: var(--lg-text) !important;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root + .MuiButton-root {
+  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.MuiAppBar-root .MuiButtonGroup-root > .MuiButton-root:hover {
+  background: var(--lg-surface-hover) !important;
+}
+
+.MuiAppBar-root .MuiButtonGroup-contained > .MuiButton-root:first-child {
+  background: color-mix(in srgb, var(--apple-accent) 55%, transparent) !important;
+}
+
+/* A-Z picker: a slim vertical pill */
+.alphaPicker-fixed-right .MuiPaper-root {
+  background: var(--lg-surface);
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill);
+  box-shadow: var(--lg-glass-shadow);
+  padding: 6px 0;
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+}
+
+.alphaPicker-fixed-right .MuiToggleButton-root {
+  border-radius: var(--lg-radius-pill) !important;
+  color: var(--lg-text-dim);
+}
+
+.alphaPicker-fixed-right .MuiToggleButton-root:hover {
+  background: var(--lg-surface-hover);
+  color: #fff;
+}
+
+.alphaPicker-fixed-right .MuiToggleButton-root.Mui-selected {
+  background: var(--lg-surface-active);
+  color: #fff;
+}
+
+/* Centered poster captions on library and detail pages (not home rows) */
+.page:not(.homePage) .cardText {
+  text-align: center;
+}
+
+/* ==========================================================================
+   14. Item detail pages (desktop): full-bleed backdrop, centered content
+   ========================================================================== */
+.layout-desktop .itemDetailPage .itemBackdrop {
+  height: 80vh;
+  min-height: 520px;
+  margin-top: -48px;
+}
+
+.layout-desktop .itemDetailPage .itemBackdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 14, 0.55) 0%,
+    rgba(10, 10, 14, 0) 18%,
+    rgba(10, 10, 14, 0) 38%,
+    rgba(10, 10, 14, 0.78) 78%,
+    rgb(10, 10, 14) 100%
+  );
+}
+
+/* Detail pages sit on solid dark so the backdrop fade has no seam */
+body:has(.itemDetailPage:not(.hide)) .backgroundContainer:not(.withBackdrop) {
+  background-image: none !important;
+  background-color: rgb(10, 10, 14) !important;
+}
+
+.layout-desktop .itemDetailPage .detailImageContainer {
+  display: none !important;
+}
+
+.layout-desktop .itemDetailPage .detailLogo {
+  left: 50%;
+  right: auto;
+  top: calc(80vh - 24vh - 16.5em);
+  width: min(60vw, 780px);
+  height: 24vh;
+  transform: translateX(-50%);
+  background-position: center bottom;
+  filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.5));
+}
+
+.layout-desktop .itemDetailPage .detailLogo:not(.hide) ~ .detailPageWrapperContainer .nameContainer:not(:has(.parentName)) .itemName {
+  display: none;
+}
+
+.layout-desktop .itemDetailPage .detailRibbon {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  margin-top: -13em;
+  padding: 0 5vw !important;
+  background: transparent !important;
+  text-align: center;
+}
+
+.layout-desktop .itemDetailPage .infoWrapper {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.layout-desktop .itemDetailPage .nameContainer {
+  align-items: center;
+}
+
+.layout-desktop .itemDetailPage .itemName {
+  font-size: 2.2rem;
+  white-space: normal;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+}
+
+.layout-desktop .itemDetailPage .itemMiscInfo {
+  justify-content: center;
+}
+
+.layout-desktop .itemDetailPage .mediaInfoOfficialRating {
+  border-radius: var(--lg-radius-pill);
+  padding: 0.1em 0.7em;
+}
+
+.layout-desktop .itemDetailPage .mainDetailButtons {
+  justify-content: center;
+  gap: 10px;
+  margin: 0.6em 0 0;
+}
+
+.layout-desktop .itemDetailPage .detailButton {
+  width: 46px;
+  height: 46px;
+  margin: 0;
+  padding: 0;
+  border: var(--lg-border);
+  border-radius: 50% !important;
+  background: var(--lg-surface);
+  box-shadow: var(--lg-glass-shadow);
+  color: var(--lg-text);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+}
+
+.layout-desktop .itemDetailPage .detailButton:hover {
+  background: var(--lg-surface-active);
+  box-shadow: var(--lg-specular), var(--lg-glow);
+}
+
+.layout-desktop .itemDetailPage .btnPlay {
+  background: color-mix(in srgb, var(--apple-accent) 55%, transparent);
+}
+
+.layout-desktop .itemDetailPage .detailPagePrimaryContent {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.25em 5vw 0 !important;
+  text-align: center;
+}
+
+.layout-desktop .itemDetailPage .trackSelections {
+  justify-content: center;
+}
+
+.layout-desktop .itemDetailPage .itemExternalLinks a {
+  display: inline-block;
+  margin: 0 4px;
+  padding: 0.25em 0.9em;
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill);
+  background: var(--lg-surface);
+  box-shadow: var(--lg-specular);
+  color: var(--lg-text);
+}
+
+/* ==========================================================================
+   15. Scrollbars, lists, accessibility
    ========================================================================== */
 * {
   scrollbar-width: thin;
