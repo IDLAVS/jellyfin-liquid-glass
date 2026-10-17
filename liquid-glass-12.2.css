@@ -16,7 +16,13 @@
 
   --lg-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 
-  --lg-surface: rgba(20, 20, 26, 0.55);
+  /* Public, user-tunable variables */
+  --glass-blur: blur(24px) saturate(180%);
+  --glass-base: rgba(20, 20, 26, 0.55);
+  --card-radius: 16px;
+  --apple-accent: #0a84ff;
+
+  --lg-surface: var(--glass-base);
   --lg-surface-strong: rgba(20, 20, 26, 0.75);
   --lg-surface-hover: rgba(255, 255, 255, 0.10);
   --lg-surface-active: rgba(255, 255, 255, 0.16);
@@ -24,7 +30,7 @@
   --lg-border-color: rgba(255, 255, 255, 0.14);
   --lg-border-strong: rgba(255, 255, 255, 0.30);
 
-  --lg-blur: blur(24px) saturate(180%);
+  --lg-blur: var(--glass-blur);
   --lg-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
   --lg-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
   --lg-shadow-deep: 0 24px 56px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -34,7 +40,7 @@
   --lg-text: rgba(255, 255, 255, 0.92);
   --lg-text-dim: rgba(255, 255, 255, 0.62);
 
-  --lg-radius-card: 16px;
+  --lg-radius-card: var(--card-radius);
   --lg-radius-button: 12px;
   --lg-radius-pill: 9999px;
   --lg-radius-carousel: 18px;
@@ -94,7 +100,7 @@ body::after {
 }
 
 ::selection {
-  background: rgba(10, 132, 255, 0.45);
+  background: color-mix(in srgb, var(--apple-accent) 45%, transparent);
   color: #fff;
 }
 
@@ -265,7 +271,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 .button-submit,
 .btnPlay.raised,
 .MuiButton-containedPrimary {
-  background: linear-gradient(180deg, rgba(10, 132, 255, 0.75), rgba(10, 132, 255, 0.5)) !important;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--apple-accent) 75%, transparent), color-mix(in srgb, var(--apple-accent) 50%, transparent)) !important;
 }
 
 .emby-button:active,
@@ -289,7 +295,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 .emby-textarea:focus,
 .emby-select:focus {
   border-color: var(--lg-border-strong) !important;
-  box-shadow: var(--lg-specular), 0 0 0 3px rgba(10, 132, 255, 0.35);
+  box-shadow: var(--lg-specular), 0 0 0 3px color-mix(in srgb, var(--apple-accent) 35%, transparent);
   outline: none;
 }
 
@@ -330,7 +336,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 }
 
 .itemProgressBarForeground {
-  background: linear-gradient(90deg, #0a84ff, #64d2ff) !important;
+  background: linear-gradient(90deg, var(--apple-accent), color-mix(in srgb, var(--apple-accent) 60%, #fff)) !important;
   border-radius: var(--lg-radius-pill);
 }
 
@@ -462,7 +468,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 }
 
 .mdl-slider-background-lower {
-  background: linear-gradient(90deg, #0a84ff, #64d2ff) !important;
+  background: linear-gradient(90deg, var(--apple-accent), color-mix(in srgb, var(--apple-accent) 60%, #fff)) !important;
 }
 
 .mdl-slider::-webkit-slider-thumb {
@@ -691,7 +697,7 @@ body:has(.itemDetailPage:not(.hide)) .backdropContainer {
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :root {
-    --lg-surface: rgba(20, 20, 26, 0.9);
+    --glass-base: rgba(20, 20, 26, 0.9);
     --lg-surface-strong: rgba(20, 20, 26, 0.95);
   }
 }
