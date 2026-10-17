@@ -1,0 +1,827 @@
+/*
+ * Liquid Glass for Jellyfin 12.2
+ * Apple-inspired frosted glass theme. Paste into Dashboard > General > Custom CSS,
+ * or load with: @import url("https://cdn.jsdelivr.net/gh/<user>/<repo>@main/liquid-glass-12.2.css");
+ *
+ * Set your own background by overriding --custom-bg, e.g.:
+ *   :root { --custom-bg: url("https://cdn.jsdelivr.net/gh/<user>/<repo>@main/assets/bg.jpg"); }
+ */
+
+/* ==========================================================================
+   1. Design tokens
+   ========================================================================== */
+:root {
+  --custom-bg: url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-liquid-glass@main/assets/background.jpg");
+
+  --lg-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+
+  --lg-surface: rgba(18, 18, 22, 0.45);
+  --lg-surface-hover: rgba(255, 255, 255, 0.10);
+  --lg-surface-active: rgba(255, 255, 255, 0.16);
+  --lg-surface-opaque: rgba(12, 12, 16, 0.85);
+  --lg-border: 1px solid rgba(255, 255, 255, 0.12);
+  --lg-border-color: rgba(255, 255, 255, 0.12);
+  --lg-border-strong: rgba(255, 255, 255, 0.28);
+
+  --lg-blur: blur(28px) saturate(190%);
+  --lg-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.22);
+  --lg-specular-bottom: inset 0 -1px 1px 0 rgba(255, 255, 255, 0.06);
+  --lg-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --lg-shadow-deep: 0 24px 64px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.35);
+  --lg-glow: 0 0 0 1px rgba(255, 255, 255, 0.22), 0 0 24px rgba(120, 170, 255, 0.35);
+
+  --lg-accent: #0a84ff;
+  --lg-text: rgba(255, 255, 255, 0.92);
+  --lg-text-dim: rgba(255, 255, 255, 0.62);
+
+  --lg-radius-card: 16px;
+  --lg-radius-button: 12px;
+  --lg-radius-pill: 9999px;
+  --lg-radius-carousel: 18px;
+
+  --lg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ==========================================================================
+   2. Base typography & background layering
+   ========================================================================== */
+html,
+body,
+button,
+input,
+select,
+textarea,
+.MuiTypography-root {
+  font-family: var(--lg-font) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background: #07070a !important;
+  color-scheme: dark;
+}
+
+body {
+  position: relative;
+  background: transparent !important;
+  color: var(--lg-text);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: var(--custom-bg) center / cover no-repeat fixed;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(40, 60, 110, 0.28) 0%, transparent 55%),
+    radial-gradient(ellipse at center, rgba(7, 7, 10, 0.35) 0%, rgba(7, 7, 10, 0.88) 100%);
+  pointer-events: none;
+}
+
+.mainAnimatedPages,
+.page,
+.skinBody,
+.libraryPage,
+.pageContainer,
+.content-primary {
+  background: transparent !important;
+}
+
+::selection {
+  background: rgba(10, 132, 255, 0.45);
+  color: #fff;
+}
+
+/* ==========================================================================
+   3. Backdrop suppression (Jellyfin 12.x stacking)
+   ========================================================================== */
+.backdropContainer,
+.backdropImage {
+  background-color: transparent !important;
+}
+
+/* Home dashboard and general pages: hide the dynamic backdrop */
+.homeSectionsContainer ~ .backdropContainer,
+body:has(.homeSectionsContainer:not(.hide)) .backdropContainer,
+body:has(.libraryPage:not(.hide)) .backdropContainer,
+body:has(.page:not(.hide):not(.itemDetailPage)) .backdropContainer {
+  display: none !important;
+}
+
+/* Item detail pages: keep the dynamic backdrop, softly masked */
+body:has(.itemDetailPage:not(.hide)) .backdropContainer {
+  display: block !important;
+  opacity: 0.55;
+  z-index: -1;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
+}
+
+.itemDetailPage:not(.hide) .backdropImage {
+  filter: saturate(1.2) brightness(0.8);
+}
+
+.itemDetailPage:not(.hide) .detailPagePrimaryContainer,
+.itemDetailPage:not(.hide) .detailRibbon {
+  background: transparent !important;
+}
+
+/* ==========================================================================
+   4. Shared glass surface
+   ========================================================================== */
+.skinHeader,
+.mainDrawer,
+.dialog,
+.actionSheet,
+.formDialog,
+.MuiPaper-root,
+.MuiMenu-paper,
+.MuiPopover-paper,
+.MuiDialog-paper,
+.toast,
+.sidebarLink,
+.emby-collapsible-button {
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+}
+
+/* Modals, dialogs, action sheets */
+.dialog,
+.actionSheet,
+.formDialog,
+.MuiDialog-paper,
+.MuiMenu-paper,
+.MuiPopover-paper,
+.MuiPaper-root.MuiPaper-elevation {
+  background: var(--lg-surface) !important;
+  background-color: var(--lg-surface) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-card) !important;
+  box-shadow: var(--lg-specular), var(--lg-shadow-deep) !important;
+  color: var(--lg-text);
+}
+
+.dialogBackdrop,
+.MuiBackdrop-root {
+  background: rgba(0, 0, 0, 0.5) !important;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.actionSheetMenuItem,
+.MuiMenuItem-root {
+  border-radius: 10px;
+  margin: 2px 6px;
+  transition: background 0.25s var(--lg-ease);
+}
+
+.actionSheetMenuItem:hover,
+.actionSheetMenuItem:focus,
+.MuiMenuItem-root:hover,
+.MuiMenuItem-root.Mui-focusVisible {
+  background: var(--lg-surface-hover) !important;
+}
+
+/* ==========================================================================
+   5. Header, drawer and navigation
+   ========================================================================== */
+.skinHeader {
+  background: var(--lg-surface) !important;
+  background-color: var(--lg-surface) !important;
+  border: 0 !important;
+  border-bottom: var(--lg-border) !important;
+  box-shadow: var(--lg-specular), 0 8px 32px rgba(0, 0, 0, 0.35) !important;
+  color: var(--lg-text);
+}
+
+.skinHeader.semiTransparent {
+  background: rgba(18, 18, 22, 0.3) !important;
+}
+
+.mainDrawer {
+  background: var(--lg-surface) !important;
+  background-color: var(--lg-surface) !important;
+  border: 0 !important;
+  border-right: var(--lg-border) !important;
+  box-shadow: var(--lg-specular), var(--lg-shadow-deep) !important;
+}
+
+.mainDrawer-scrollContainer {
+  background: transparent !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.22);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.navMenuOption,
+.navMenuOption-selected,
+.sidebarLink,
+.lnkMediaFolder {
+  border-radius: var(--lg-radius-button) !important;
+  margin: 2px 10px !important;
+  color: var(--lg-text) !important;
+  transition: background 0.25s var(--lg-ease), box-shadow 0.25s var(--lg-ease), transform 0.25s var(--lg-ease);
+}
+
+.navMenuOption:hover,
+.sidebarLink:hover,
+.lnkMediaFolder:hover {
+  background: var(--lg-surface-hover) !important;
+  box-shadow: var(--lg-specular);
+  transform: translateX(2px);
+}
+
+.navMenuOption-selected,
+.sidebarLink.selected,
+.sidebarLink.Mui-selected {
+  background: var(--lg-surface-active) !important;
+  box-shadow: var(--lg-specular), 0 0 0 1px var(--lg-border-color);
+}
+
+.headerTabs .emby-tab-button {
+  border-radius: var(--lg-radius-pill);
+  transition: background 0.25s var(--lg-ease), color 0.25s var(--lg-ease);
+}
+
+.headerTabs .emby-tab-button:hover {
+  background: var(--lg-surface-hover);
+}
+
+.headerTabs .emby-tab-button-active {
+  background: var(--lg-surface-active);
+  box-shadow: var(--lg-specular);
+  color: #fff;
+}
+
+/* ==========================================================================
+   6. Buttons, inputs, badges
+   ========================================================================== */
+.button-flat,
+.emby-button,
+.raised,
+.MuiButton-root,
+.detailButton,
+.paper-icon-button-light {
+  border-radius: var(--lg-radius-button) !important;
+  transition: background 0.25s var(--lg-ease), box-shadow 0.25s var(--lg-ease), transform 0.25s var(--lg-ease);
+}
+
+.raised,
+.button-submit,
+.MuiButton-contained {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: var(--lg-border) !important;
+  box-shadow: var(--lg-specular), 0 6px 18px rgba(0, 0, 0, 0.3) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  color: #fff !important;
+}
+
+.raised:hover,
+.button-submit:hover,
+.MuiButton-contained:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+  box-shadow: var(--lg-specular), var(--lg-glow) !important;
+}
+
+.button-submit,
+.btnPlay.raised,
+.MuiButton-containedPrimary {
+  background: linear-gradient(180deg, rgba(10, 132, 255, 0.75), rgba(10, 132, 255, 0.5)) !important;
+}
+
+.emby-button:active,
+.raised:active {
+  transform: scale(0.97);
+}
+
+.emby-input,
+.emby-textarea,
+.emby-select,
+.emby-select-withcolor,
+.MuiInputBase-root,
+.MuiOutlinedInput-root {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-button) !important;
+  box-shadow: var(--lg-specular);
+  color: var(--lg-text) !important;
+}
+
+.emby-input:focus,
+.emby-textarea:focus,
+.emby-select:focus {
+  border-color: var(--lg-border-strong) !important;
+  box-shadow: var(--lg-specular), 0 0 0 3px rgba(10, 132, 255, 0.35);
+  outline: none;
+}
+
+/* Search: full pill */
+.searchfields-txtSearch,
+.searchFields .emby-input,
+.searchInput,
+.MuiAutocomplete-root .MuiInputBase-root,
+.headerSearchButton + .searchContainer .emby-input {
+  border-radius: var(--lg-radius-pill) !important;
+  padding-left: 1.25em !important;
+  padding-right: 1.25em !important;
+}
+
+/* Status badges: full pill */
+.countIndicator,
+.playedIndicator,
+.unplayedItemsIndicator,
+.itemProgressBar,
+.mediaInfoItem,
+.mediaInfoCriticRating,
+.mediaInfoOfficialRating,
+.starRatingContainer,
+.MuiChip-root,
+.badge {
+  border-radius: var(--lg-radius-pill) !important;
+}
+
+.countIndicator,
+.playedIndicator,
+.unplayedItemsIndicator,
+.mediaInfoOfficialRating {
+  background: rgba(18, 18, 22, 0.55) !important;
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  color: #fff !important;
+}
+
+.innerCardFooter .itemProgressBar,
+.itemProgressBar {
+  overflow: hidden;
+}
+
+.itemProgressBarForeground {
+  background: linear-gradient(90deg, #0a84ff, #64d2ff) !important;
+  border-radius: var(--lg-radius-pill);
+}
+
+/* ==========================================================================
+   7. Media cards
+   ========================================================================== */
+.cardBox {
+  border-radius: var(--lg-radius-card);
+  transition: transform 0.35s var(--lg-ease), box-shadow 0.35s var(--lg-ease);
+  will-change: transform;
+}
+
+.cardScalable {
+  border-radius: var(--lg-radius-card);
+  overflow: hidden;
+  background: var(--lg-surface);
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular), 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.35s var(--lg-ease), box-shadow 0.35s var(--lg-ease), border-color 0.35s var(--lg-ease);
+}
+
+.cardImageContainer,
+.cardImage,
+.cardPadder,
+.cardOverlayContainer {
+  border-radius: var(--lg-radius-card);
+}
+
+.cardBox:hover,
+.cardBox:focus-within {
+  transform: translateY(-4px);
+}
+
+.cardBox:hover .cardScalable,
+.cardBox:focus-within .cardScalable,
+.card:focus .cardScalable {
+  border-color: var(--lg-border-strong);
+  box-shadow:
+    var(--lg-specular),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 0 28px rgba(120, 170, 255, 0.32),
+    0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+.cardOverlayContainer {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 60%) !important;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.cardText {
+  color: var(--lg-text);
+}
+
+.cardText-secondary {
+  color: var(--lg-text-dim);
+}
+
+.cardOverlayButton {
+  background: rgba(18, 18, 22, 0.55) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-specular);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+}
+
+/* Section titles & detail posters */
+.sectionTitle,
+.sectionTitle-cards {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.detailImageContainer .cardBox,
+.detailImageContainer .cardScalable,
+.detailImageContainer .cardImageContainer,
+.detailImageContainer img {
+  border-radius: var(--lg-radius-card);
+}
+
+.detailImageContainer .cardScalable {
+  box-shadow: var(--lg-specular), var(--lg-shadow-deep);
+}
+
+.itemBackdrop,
+.chapterCardImageContainer,
+.personCard .cardImageContainer {
+  border-radius: var(--lg-radius-card);
+}
+
+/* ==========================================================================
+   8. Now playing bar & player controls
+   ========================================================================== */
+.nowPlayingBar,
+.nowPlayingBarInfoContainer,
+.nowPlayingBarCenter {
+  background: var(--lg-surface-opaque) !important;
+  background-color: var(--lg-surface-opaque) !important;
+}
+
+.nowPlayingBar {
+  border: 0 !important;
+  border-top: var(--lg-border) !important;
+  border-radius: var(--lg-radius-card) var(--lg-radius-card) 0 0;
+  box-shadow: var(--lg-specular), 0 -12px 40px rgba(0, 0, 0, 0.5) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  color: var(--lg-text);
+}
+
+.nowPlayingBarInfoContainer,
+.nowPlayingBarCenter {
+  background: transparent !important;
+}
+
+.nowPlayingImage,
+.nowPlayingBarImage {
+  border-radius: 10px;
+}
+
+.videoOsdBottom,
+.videoOsdBottom .osdControls,
+.upNextContainer,
+.osdHeader,
+.skinHeader.osdHeader {
+  background: var(--lg-surface-opaque) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+}
+
+.videoOsdBottom {
+  border-top: var(--lg-border);
+  border-radius: var(--lg-radius-card) var(--lg-radius-card) 0 0;
+  box-shadow: var(--lg-specular), 0 -12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.osdHeader {
+  border-bottom: var(--lg-border);
+}
+
+.nowPlayingBar .emby-button,
+.videoOsdBottom .emby-button,
+.nowPlayingPage .emby-button {
+  border-radius: var(--lg-radius-button);
+}
+
+.nowPlayingBar .emby-button:hover,
+.videoOsdBottom .emby-button:hover,
+.nowPlayingPage .emby-button:hover {
+  background: var(--lg-surface-hover);
+}
+
+.nowPlayingPage,
+.nowPlayingPlaylist,
+.nowPlayingInfoContainer {
+  background: transparent !important;
+}
+
+.nowPlayingPage .backdropContainer {
+  display: none !important;
+}
+
+/* Sliders */
+.mdl-slider-background-lower,
+.sliderMarkerContainer,
+.mdl-slider-background-flex {
+  border-radius: var(--lg-radius-pill);
+}
+
+.mdl-slider-background-upper {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+.mdl-slider-background-lower {
+  background: linear-gradient(90deg, #0a84ff, #64d2ff) !important;
+}
+
+.mdl-slider::-webkit-slider-thumb {
+  background: #fff !important;
+  border: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(255, 255, 255, 0.18);
+}
+
+.mdl-slider::-moz-range-thumb {
+  background: #fff !important;
+  border: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(255, 255, 255, 0.18);
+}
+
+.sliderBubble {
+  background: rgba(18, 18, 22, 0.7) !important;
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-specular), var(--lg-shadow);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+}
+
+/* ==========================================================================
+   9. Plugin: Media Bar (featured carousel)
+   ========================================================================== */
+#slides-container,
+.slides-container,
+.mediaBar,
+#mediaBarContainer,
+.media-bar,
+.featured-carousel,
+.homePage .slideshowContainer {
+  border-radius: var(--lg-radius-carousel) !important;
+  overflow: hidden;
+  border: var(--lg-border);
+  box-shadow: var(--lg-specular), var(--lg-shadow-deep);
+  position: relative;
+  /* Soft side vignettes */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
+}
+
+#slides-container .slide,
+.slides-container .slide,
+.mediaBar .slide,
+.media-bar .slide,
+.featured-carousel .slide {
+  border-radius: var(--lg-radius-carousel);
+}
+
+#slides-container .slide-info,
+#slides-container .slide-content,
+.mediaBar .slide-info,
+.media-bar .slide-info {
+  background: linear-gradient(to top, rgba(7, 7, 10, 0.75), transparent) !important;
+}
+
+#slides-container .btn-play,
+#slides-container .slide-button,
+.mediaBar .slide-button,
+.media-bar .slide-button {
+  border-radius: var(--lg-radius-button) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: var(--lg-border) !important;
+  box-shadow: var(--lg-specular);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+}
+
+#slides-container .btn-play:hover,
+#slides-container .slide-button:hover {
+  box-shadow: var(--lg-specular), var(--lg-glow);
+}
+
+/* ==========================================================================
+   10. Plugin: Intro Skipper
+   ========================================================================== */
+#skipIntro,
+#skipCredits,
+.skipIntro,
+.skip-intro,
+.skipSegment,
+.skip-segment,
+.skip-button,
+#skipIntro .emby-button,
+#skipCredits .emby-button {
+  background: rgba(18, 18, 22, 0.45) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-specular), var(--lg-shadow) !important;
+  color: #fff !important;
+  padding: 0.7em 1.5em !important;
+  font-weight: 600;
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  transition: border-color 0.3s var(--lg-ease), box-shadow 0.3s var(--lg-ease), transform 0.3s var(--lg-ease);
+}
+
+#skipIntro:hover,
+#skipCredits:hover,
+.skipIntro:hover,
+.skip-intro:hover,
+.skipSegment:hover,
+.skip-segment:hover,
+.skip-button:hover,
+#skipIntro .emby-button:hover,
+#skipCredits .emby-button:hover {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: var(--lg-specular), var(--lg-glow) !important;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   11. Plugin: In-Player Episode Preview / scrubbing thumbnails
+   ========================================================================== */
+.episodePreview,
+.episode-preview,
+.episodePreviewModal,
+.episode-preview-modal,
+#episodePreview,
+#episodePreviewContainer,
+.trickplayBubble,
+.chapterThumbContainer,
+.sliderBubbleThumb,
+.scrubbingThumbnail {
+  background: rgba(18, 18, 22, 0.45) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-card) !important;
+  box-shadow: var(--lg-specular), inset 0 0 0 1px rgba(255, 255, 255, 0.06), var(--lg-shadow-deep) !important;
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(40px) saturate(190%);
+  backdrop-filter: blur(40px) saturate(190%);
+  color: var(--lg-text);
+}
+
+.episodePreview img,
+.episode-preview img,
+.trickplayBubble img,
+.scrubbingThumbnail img {
+  border-radius: calc(var(--lg-radius-card) - 4px);
+}
+
+/* ==========================================================================
+   12. Plugins: Jellyfin Enhanced & Moonfin
+   ========================================================================== */
+#jellyfin-enhanced-panel,
+.jellyfin-enhanced-panel,
+.je-panel,
+.je-drawer,
+.je-sidebar,
+.je-modal,
+#je-settings-panel,
+.moonfin-drawer,
+.moonfin-sidebar,
+.moonfin-panel,
+.moonfin-modal,
+#moonfin-sidebar,
+#moonfin-drawer {
+  background: var(--lg-surface) !important;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-card) !important;
+  box-shadow: var(--lg-specular), var(--lg-shadow-deep) !important;
+  color: var(--lg-text) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+}
+
+.je-drawer,
+.je-sidebar,
+.moonfin-drawer,
+.moonfin-sidebar,
+#moonfin-sidebar,
+#moonfin-drawer {
+  border-radius: 0 var(--lg-radius-card) var(--lg-radius-card) 0 !important;
+  border-top-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+.je-panel button,
+.je-drawer button,
+.je-sidebar button,
+.moonfin-panel button,
+.moonfin-drawer button,
+.moonfin-sidebar button {
+  border-radius: var(--lg-radius-button);
+  transition: background 0.25s var(--lg-ease), box-shadow 0.25s var(--lg-ease);
+}
+
+.je-panel button:hover,
+.je-drawer button:hover,
+.je-sidebar button:hover,
+.moonfin-panel button:hover,
+.moonfin-drawer button:hover,
+.moonfin-sidebar button:hover {
+  background: var(--lg-surface-hover);
+  box-shadow: var(--lg-specular);
+}
+
+/* ==========================================================================
+   13. Scrollbars, toasts, misc
+   ========================================================================== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border: 2px solid transparent;
+  border-radius: var(--lg-radius-pill);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+  background-clip: padding-box;
+}
+
+.toast,
+.MuiSnackbarContent-root {
+  background: var(--lg-surface) !important;
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-pill) !important;
+  box-shadow: var(--lg-specular), var(--lg-shadow) !important;
+  color: #fff !important;
+}
+
+.paperList,
+.listItem,
+.verticalSection .paperList {
+  background: var(--lg-surface);
+  border-radius: var(--lg-radius-card);
+}
+
+.listItem {
+  border-radius: var(--lg-radius-button);
+  transition: background 0.25s var(--lg-ease);
+}
+
+.listItem:hover {
+  background: var(--lg-surface-hover);
+}
+
+.checkboxIcon,
+.emby-checkbox:checked + span + .checkboxIcon {
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .cardBox:hover,
+  .cardBox:focus-within {
+    transform: none;
+  }
+}
+
+/* Fallback for engines without backdrop-filter: use a more opaque surface */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --lg-surface: rgba(18, 18, 22, 0.88);
+  }
+}
