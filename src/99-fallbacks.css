@@ -39,7 +39,7 @@
 
 /* High-contrast / forced-colors modes: drop the decoration, keep the edges. */
 @media (forced-colors: active) {
-  .backgroundContainer::before {
+  html::before {
     display: none;
   }
 

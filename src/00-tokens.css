@@ -35,6 +35,9 @@
   --lg-wallpaper-brightness: 0.65; /* 1 = untouched, 0 = black */
   --lg-wallpaper-blur: 0px;
 
+  /* Diameter of every round icon button in the header pill, avatar included. */
+  --lg-header-icon-size: 38px;
+
   /* Header pills fade slightly on pages with a full-bleed backdrop (0-1). */
   --lg-header-idle-opacity: 0.85;
 

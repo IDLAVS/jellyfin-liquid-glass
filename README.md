@@ -50,7 +50,7 @@ Prefer to apply it to one account only? Paste the same line into **User menu →
 | Where | Setting | Why |
 | --- | --- | --- |
 | Settings → Display | **Theme: Dark** | The glass palette is dark-only. In Light mode the theme still forces its dark palette, but Jellyfin's own light-mode assets can look out of place. |
-| Settings → Display | **Backdrops: on** | Movie and show pages then show their artwork behind the glass. Off gives you your wallpaper everywhere. |
+| Settings → Display | **Backdrops: off** (if you use a wallpaper) | With Backdrops on, Jellyfin shows rotating artwork behind the home and library pages and that artwork takes priority over your wallpaper there. Off gives you your wallpaper on every page. Item pages draw their own banner either way. |
 | Settings → Display | **Display mode: Auto** (or Desktop) | The header pills are designed for the Auto/Desktop/Mobile layouts. The legacy **TV** layout does not use the new header and is not styled. |
 | Settings → Home | Remove sections you don't use | Fewer rows means fewer blurred layers and a smoother scroll. |
 | Browser | Chrome / Edge **105+**, Firefox **121+**, Safari **16+** | The theme uses `:has()`. Everything else degrades gracefully; see [Compatibility](#browser-support). |
@@ -104,6 +104,7 @@ Add overrides **below** the `@import` line, in the same Custom CSS box:
 | `--lg-card-radius` | `16px` | Corner radius of cards and panes. |
 | `--lg-button-radius` | `12px` | Corner radius of buttons and inputs. |
 | `--lg-header-idle-opacity` | `0.85` | Header pill opacity on backdrop pages until hovered. |
+| `--lg-header-icon-size` | `38px` | Size of the round header icons; the avatar matches it. |
 | `--lg-mediabar-base` | `rgb(8 8 12)` | Solid layer behind Media Bar slides. `transparent` turns it off. |
 | `--lg-wallpaper` | `none` | Wallpaper image. See below. |
 | `--lg-wallpaper-brightness` | `0.65` | `1` is the original image, `0` is black. |
@@ -128,7 +129,7 @@ Tips:
 - **Use a full `https://` URL.** Relative paths resolve against the stylesheet, not your server, and won't load.
 - The image must be reachable from the *browser*, not just the server. A file on a LAN-only host will not show on other networks.
 - Use a large (1920×1080 or bigger) image, ideally under 500 KB, so first paint is quick. JPEG or WebP.
-- Wallpaper shows on home, library and settings pages. On pages where Jellyfin shows an item backdrop, the wallpaper fades out and the backdrop fades in.
+- The wallpaper sits underneath everything Jellyfin draws, so it can never cover the video player. It shows wherever Jellyfin's own layers are clear. If Settings → Display → **Backdrops** is on, Jellyfin's backdrop artwork is drawn over the wallpaper on the pages that use it.
 - Moving from v1? `--custom-bg` and `--bgImage` still work and are used when `--lg-wallpaper` is not set.
 
 ## Upgrading from v1
@@ -163,6 +164,8 @@ The full-screen item-page redesign from v1 (fixed-offset logo and poster positio
 - **Backdrop flash on movie/show pages.** The flash came from rules keyed to `body:has(.itemDetailPage:not(.hide))`, which flips twice during a route change. The mask is now permanent and every change that follows `.withBackdrop` is a cross-fade.
 - **Header hover shift** (reported in #35). Hover used to add a border to icon buttons, growing them and nudging the library grid down. Hover now only changes colour and shadow.
 - **A-Z picker clipped at the bottom** (#35). Centred vertically and capped to the viewport.
+- **Wallpaper covering the video / missing on the home page.** The first release painted the wallpaper inside `.backgroundContainer`. Jellyfin makes that container transparent during playback, but a layer inside it kept painting over the video. The wallpaper now lives underneath the whole UI (`html::before`, `z-index: -2`), so it cannot cover anything.
+- **Avatar too small in the header.** Jellyfin's avatar is 40px in a padding-free button; the theme shrank it to 28px. All header icon buttons and the avatar now share one size (`--lg-header-icon-size`).
 - **No blur on iPad / iOS.** Every blur ships both `backdrop-filter` and `-webkit-backdrop-filter`.
 - **Fragile selectors.** No rule targets generated Emotion classes (`.css-1iogify` and friends), which change between Jellyfin builds. The audit script fails the build if one slips in.
 
@@ -173,7 +176,7 @@ The full-screen item-page redesign from v1 (fixed-offset logo and poster positio
 | Nothing changed | Hard-refresh; if using `@main`, purge the CDN (see Install). Check the Custom CSS box saved. |
 | Header looks plain / not floating | Display mode is TV, or a very old browser without `:has()` (see Browser support). |
 | No blur, boxes look flat | Hardware acceleration is off, or the engine lacks `backdrop-filter`. Glass falls back to opaque on purpose. |
-| Wallpaper not showing | The URL isn't reachable from the browser, or isn't a full `https://` URL. Try opening it in a new tab. |
+| Wallpaper not showing | Check Settings → Display → **Backdrops** (on = Jellyfin's artwork replaces the wallpaper on home/library pages). Otherwise the URL isn't reachable from the browser, or isn't a full `https://` URL; try opening it in a new tab. |
 | Text hard to read | Lower `--lg-wallpaper-brightness` or raise `--lg-glass-opacity`. |
 | Scrolling is choppy | Lower `--lg-blur-radius` (e.g. `12px`) and remove unused home sections. |
 

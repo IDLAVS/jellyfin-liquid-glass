@@ -97,8 +97,16 @@
   border-radius: var(--lg-radius-pill) 0 0 var(--lg-radius-pill);
 }
 
+/* Every round icon in the bar is the same size, so the avatar lines up with
+   the rest. Jellyfin's avatar is 40px inside a padding-0 button; sizing the
+   button and letting the avatar fill all but a 1px ring keeps them matched. */
 .MuiAppBar-root .MuiIconButton-root {
-  padding: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--lg-header-icon-size);
+  height: var(--lg-header-icon-size);
+  padding: 0;
   color: var(--lg-text);
   transition: background-color var(--lg-duration) var(--lg-ease);
 }
@@ -110,14 +118,9 @@
   }
 }
 
-/* The avatar is 40px by default; match it to the other icons. */
-.MuiAppBar-root .MuiIconButton-root[aria-controls="app-user-menu"] {
-  padding: 4px;
-}
-
 .MuiAppBar-root .MuiAvatar-root {
-  width: 28px;
-  height: 28px;
+  width: calc(var(--lg-header-icon-size) - 2px);
+  height: calc(var(--lg-header-icon-size) - 2px);
   font-size: 1rem;
 }
 

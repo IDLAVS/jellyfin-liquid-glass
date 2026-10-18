@@ -11,8 +11,9 @@
    During a route change the old and new page both exist for a moment, so that
    condition flipped true -> false -> true and the layers snapped.
 
-   Fix: nothing here depends on page state. The mask is permanent, and every
-   visual change that follows .withBackdrop is a cross-fade, never a snap.
+   Fix: nothing here depends on page state. The mask is permanent, and the
+   one change that follows .withBackdrop (the container going from clear to a
+   dark veil, see 01-base.css) is a colour transition, never a snap.
    ========================================================================== */
 
 :root {
@@ -22,15 +23,6 @@
 
 .backgroundContainer {
   transition: background-color var(--lg-backdrop-fade) ease;
-}
-
-.backgroundContainer::before {
-  transition-duration: var(--lg-backdrop-fade);
-}
-
-/* Wallpaper hands over to the item backdrop instead of painting under it. */
-.backgroundContainer.withBackdrop::before {
-  opacity: 0;
 }
 
 .backdropContainer {

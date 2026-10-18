@@ -42,6 +42,9 @@
   --lg-wallpaper-brightness: 0.65; /* 1 = untouched, 0 = black */
   --lg-wallpaper-blur: 0px;
 
+  /* Diameter of every round icon button in the header pill, avatar included. */
+  --lg-header-icon-size: 38px;
+
   /* Header pills fade slightly on pages with a full-bleed backdrop (0-1). */
   --lg-header-idle-opacity: 0.85;
 
@@ -102,6 +105,7 @@
   color-scheme: dark;
 
   --jf-palette-background-default: var(--lg-page-base);
+  --jf-palette-background-defaultImage: none;
   --jf-palette-background-defaultChannel: 10 10 14;
   --jf-palette-background-paper: var(--lg-glass-bg-strong);
   --jf-palette-background-paperChannel: var(--lg-glass-tint);
@@ -157,8 +161,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* The wallpaper lives on .backgroundContainer, so every layer above it has to
-   be see-through. These are the only layout-neutral rules the theme needs. */
+/* The wallpaper sits underneath the whole UI (see below), so every page layer
+   above it has to be see-through. Layout-neutral: colour only. */
 body,
 #reactRoot,
 .page,
@@ -174,19 +178,45 @@ body,
 }
 
 /* --- Wallpaper -------------------------------------------------------------
-   Painted on a pseudo-element so brightness and blur can be filtered without
-   dimming anything else. It fades out (rather than snapping) when Jellyfin
-   switches the page to a backdrop, see 02-backdrop.css. */
-.backgroundContainer::before {
+   Jellyfin's stacking order, bottom to top:
+
+     html canvas  <  .backdropContainer (z -1)  <  .videoPlayerContainer
+                  <  .backgroundContainer (when no video is covering it)
+
+   The wallpaper goes on html::before at z-index -2, below ALL of that. From
+   there it can never cover the video player or the item backdrop: it only
+   shows where Jellyfin's own layers are transparent. (The first version put
+   it inside .backgroundContainer, which Jellyfin makes transparent during
+   playback, but a child layer ignores that and kept painting over the video.)
+
+   A pseudo-element rather than html's own background, so brightness and blur
+   can be filtered without touching anything else. */
+html::before {
   content: "";
   position: fixed;
   inset: calc(var(--lg-wallpaper-blur) * -2);
-  z-index: -1;
+  z-index: -2;
   background: var(--lg-wallpaper) center / cover no-repeat;
   filter: brightness(var(--lg-wallpaper-brightness)) blur(var(--lg-wallpaper-blur));
   pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.45s ease;
+}
+
+/* Jellyfin paints .backgroundContainer opaque, which would hide the wallpaper.
+   It is clear by default and only dims when Jellyfin shows a backdrop image
+   (class .withBackdrop). The colour change is transitioned, never snapped. */
+.backgroundContainer:not(.withBackdrop) {
+  background: transparent !important;
+}
+
+.backgroundContainer.withBackdrop {
+  background-color: var(--lg-page-base) !important;
+}
+
+/* Jellyfin sets these while video is the page background (OSD, trailers):
+   the container must be fully clear then, whatever else is true. */
+.backgroundContainer.backgroundContainer-transparent,
+html.transparentDocument .backgroundContainer {
+  background: transparent !important;
 }
 
 /* --- Scrollbars ------------------------------------------------------------
@@ -246,8 +276,9 @@ body,
    During a route change the old and new page both exist for a moment, so that
    condition flipped true -> false -> true and the layers snapped.
 
-   Fix: nothing here depends on page state. The mask is permanent, and every
-   visual change that follows .withBackdrop is a cross-fade, never a snap.
+   Fix: nothing here depends on page state. The mask is permanent, and the
+   one change that follows .withBackdrop (the container going from clear to a
+   dark veil, see 01-base.css) is a colour transition, never a snap.
    ========================================================================== */
 
 :root {
@@ -257,15 +288,6 @@ body,
 
 .backgroundContainer {
   transition: background-color var(--lg-backdrop-fade) ease;
-}
-
-.backgroundContainer::before {
-  transition-duration: var(--lg-backdrop-fade);
-}
-
-/* Wallpaper hands over to the item backdrop instead of painting under it. */
-.backgroundContainer.withBackdrop::before {
-  opacity: 0;
 }
 
 .backdropContainer {
@@ -527,8 +549,16 @@ body:has(.videoPlayerContainer) .dialogBackdrop {
   border-radius: var(--lg-radius-pill) 0 0 var(--lg-radius-pill);
 }
 
+/* Every round icon in the bar is the same size, so the avatar lines up with
+   the rest. Jellyfin's avatar is 40px inside a padding-0 button; sizing the
+   button and letting the avatar fill all but a 1px ring keeps them matched. */
 .MuiAppBar-root .MuiIconButton-root {
-  padding: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--lg-header-icon-size);
+  height: var(--lg-header-icon-size);
+  padding: 0;
   color: var(--lg-text);
   transition: background-color var(--lg-duration) var(--lg-ease);
 }
@@ -540,14 +570,9 @@ body:has(.videoPlayerContainer) .dialogBackdrop {
   }
 }
 
-/* The avatar is 40px by default; match it to the other icons. */
-.MuiAppBar-root .MuiIconButton-root[aria-controls="app-user-menu"] {
-  padding: 4px;
-}
-
 .MuiAppBar-root .MuiAvatar-root {
-  width: 28px;
-  height: 28px;
+  width: calc(var(--lg-header-icon-size) - 2px);
+  height: calc(var(--lg-header-icon-size) - 2px);
   font-size: 1rem;
 }
 
@@ -1590,7 +1615,7 @@ body:has(.selfBackdropPage:not(.hide)) .MuiAppBar-root > .MuiToolbar-root:first-
 
 /* High-contrast / forced-colors modes: drop the decoration, keep the edges. */
 @media (forced-colors: active) {
-  .backgroundContainer::before {
+  html::before {
     display: none;
   }
 

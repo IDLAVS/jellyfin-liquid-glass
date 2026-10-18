@@ -11,6 +11,7 @@
   color-scheme: dark;
 
   --jf-palette-background-default: var(--lg-page-base);
+  --jf-palette-background-defaultImage: none;
   --jf-palette-background-defaultChannel: 10 10 14;
   --jf-palette-background-paper: var(--lg-glass-bg-strong);
   --jf-palette-background-paperChannel: var(--lg-glass-tint);
@@ -66,8 +67,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* The wallpaper lives on .backgroundContainer, so every layer above it has to
-   be see-through. These are the only layout-neutral rules the theme needs. */
+/* The wallpaper sits underneath the whole UI (see below), so every page layer
+   above it has to be see-through. Layout-neutral: colour only. */
 body,
 #reactRoot,
 .page,
@@ -83,19 +84,45 @@ body,
 }
 
 /* --- Wallpaper -------------------------------------------------------------
-   Painted on a pseudo-element so brightness and blur can be filtered without
-   dimming anything else. It fades out (rather than snapping) when Jellyfin
-   switches the page to a backdrop, see 02-backdrop.css. */
-.backgroundContainer::before {
+   Jellyfin's stacking order, bottom to top:
+
+     html canvas  <  .backdropContainer (z -1)  <  .videoPlayerContainer
+                  <  .backgroundContainer (when no video is covering it)
+
+   The wallpaper goes on html::before at z-index -2, below ALL of that. From
+   there it can never cover the video player or the item backdrop: it only
+   shows where Jellyfin's own layers are transparent. (The first version put
+   it inside .backgroundContainer, which Jellyfin makes transparent during
+   playback, but a child layer ignores that and kept painting over the video.)
+
+   A pseudo-element rather than html's own background, so brightness and blur
+   can be filtered without touching anything else. */
+html::before {
   content: "";
   position: fixed;
   inset: calc(var(--lg-wallpaper-blur) * -2);
-  z-index: -1;
+  z-index: -2;
   background: var(--lg-wallpaper) center / cover no-repeat;
   filter: brightness(var(--lg-wallpaper-brightness)) blur(var(--lg-wallpaper-blur));
   pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.45s ease;
+}
+
+/* Jellyfin paints .backgroundContainer opaque, which would hide the wallpaper.
+   It is clear by default and only dims when Jellyfin shows a backdrop image
+   (class .withBackdrop). The colour change is transitioned, never snapped. */
+.backgroundContainer:not(.withBackdrop) {
+  background: transparent !important;
+}
+
+.backgroundContainer.withBackdrop {
+  background-color: var(--lg-page-base) !important;
+}
+
+/* Jellyfin sets these while video is the page background (OSD, trailers):
+   the container must be fully clear then, whatever else is true. */
+.backgroundContainer.backgroundContainer-transparent,
+html.transparentDocument .backgroundContainer {
+  background: transparent !important;
 }
 
 /* --- Scrollbars ------------------------------------------------------------
