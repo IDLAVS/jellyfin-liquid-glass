@@ -1,0 +1,300 @@
+/* ==========================================================================
+   Liquid Glass — video player
+   Floating OSD capsule · scrubber · volume · trickplay · track menus
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. OSD header (back / title / cast) over video
+   -------------------------------------------------------------------------- */
+/* React layout: OSD header is an in-flow MuiBox */
+.skinHeader.osdHeader.MuiBox-root {
+  height: auto;
+  min-height: 0;
+}
+.skinHeader.osdHeader.MuiBox-root .MuiTypography-root {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Player top bar: flush to the top with no background, blur, border,
+   shadow or fade — just the icons and title over the video */
+.skinHeader.osdHeader {
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  text-shadow: none;
+}
+
+.osdHeader-hidden,
+.skinHeader.osdHeader.osdHeader-hidden {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   2. Bottom control capsule
+   -------------------------------------------------------------------------- */
+.videoOsdBottom.videoOsdBottom-maincontrols {
+  /* centred capsule without transforms (Jellyfin animates transform itself) */
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: auto;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0.6em 1.1em 0.5em;
+  border-radius: var(--lg-radius-lg);
+  border: var(--lg-border);
+  background: var(--lg-tint-osd) !important; /* replaces Jellyfin's gradient */
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg);
+  z-index: var(--lg-z-osd);
+  transition: opacity var(--lg-dur) var(--lg-ease),
+              transform var(--lg-dur) var(--lg-spring);
+}
+.videoOsdBottom.videoOsdBottom-maincontrols.videoOsdBottom-hidden {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+}
+
+.videoOsdBottom .osdControls {
+  max-width: none;
+}
+
+/* Title / secondary info row */
+.osdTextContainer,
+.osdSecondaryMediaInfo,
+.osdMediaInfo {
+  color: var(--lg-text);
+}
+.osdTitle,
+.osdMediaTitle {
+  font-weight: 600;
+}
+.osdSecondaryMediaInfo,
+.osdEndsAt,
+.osdTimeText {
+  color: var(--lg-text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Poster thumb in OSD (if shown) */
+.osdPoster img,
+.osdPoster .cardImageContainer {
+  border-radius: var(--lg-radius-sm);
+}
+
+/* Control buttons */
+.videoOsdBottom .buttons {
+  gap: 0.1em;
+}
+.videoOsdBottom .paper-icon-button-light,
+.videoOsdBottom .osdIconButton {
+  border-radius: 50%;
+  transition: background-color var(--lg-dur-fast) var(--lg-ease),
+              transform var(--lg-dur-fast) var(--lg-spring);
+}
+.videoOsdBottom .paper-icon-button-light:hover:not(:disabled) {
+  background-color: var(--lg-tint-hover);
+  transform: scale(1.08);
+}
+.videoOsdBottom .paper-icon-button-light:active:not(:disabled) {
+  transform: scale(0.92);
+}
+/* Play / pause stands out */
+.videoOsdBottom .btnPause {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: var(--lg-highlight-soft);
+}
+
+/* --------------------------------------------------------------------------
+   3. Sliders (timeline + volume)
+   -------------------------------------------------------------------------- */
+.mdl-slider-background-flex-container {
+  padding: 0;
+}
+.mdl-slider-background-flex {
+  height: 6px;
+  margin-top: -3px;
+  border-radius: var(--lg-radius-pill);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: height var(--lg-dur-fast) var(--lg-ease),
+              margin-top var(--lg-dur-fast) var(--lg-ease);
+}
+.mdl-slider-container:hover .mdl-slider-background-flex,
+.sliderContainer:hover .mdl-slider-background-flex {
+  height: 9px;
+  margin-top: -4.5px;
+}
+.mdl-slider-background-lower {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--lg-radius-pill);
+}
+.mdl-slider-background-upper {
+  background: rgba(255, 255, 255, 0.28);
+  border-radius: var(--lg-radius-pill);
+}
+.mdl-slider-background-lower-clear {
+  background: transparent;
+}
+
+/* Thumb */
+.mdl-slider::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border: none;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.45);
+  transition: transform var(--lg-dur-fast) var(--lg-spring);
+}
+.mdl-slider:hover::-webkit-slider-thumb,
+.mdl-slider:active::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+.mdl-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Scrubber bubble + trickplay thumbnail */
+.sliderBubble {
+  border-radius: var(--lg-radius);
+  background: var(--lg-tint-strong);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  border: var(--lg-border);
+  box-shadow: var(--lg-glass-shadow);
+  overflow: hidden;
+  padding: 0;
+}
+.sliderBubbleText {
+  padding: 0.35em 0.8em;
+  font-variant-numeric: tabular-nums;
+}
+.chapterThumbContainer {
+  border-radius: var(--lg-radius);
+  overflow: hidden;
+  box-shadow: none;
+}
+.chapterThumb {
+  border-radius: var(--lg-radius) var(--lg-radius) 0 0;
+}
+.chapterThumbTextContainer {
+  background: rgba(10, 10, 12, 0.6);
+}
+
+/* Volume */
+.osdVolumeSliderContainer,
+.volumeSliderContainer {
+  min-width: 6em;
+}
+
+/* --------------------------------------------------------------------------
+   4. Up Next / end-of-episode card
+   -------------------------------------------------------------------------- */
+.upNextDialog,
+.upNextContainer {
+  border-radius: var(--lg-radius-lg);
+  border: var(--lg-border);
+  background: var(--lg-tint-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg);
+  overflow: hidden;
+}
+.upNextDialog-poster,
+.upNextDialog-poster img {
+  border-radius: var(--lg-radius-sm);
+}
+.upNextDialog .btnStartNow,
+.upNextDialog .btnHide,
+.upNextDialog button {
+  border-radius: var(--lg-radius-pill);
+}
+
+/* --------------------------------------------------------------------------
+   5. Native skip-segment button (Jellyfin 10.10+ media segments)
+   -------------------------------------------------------------------------- */
+.skip-button,
+.btnSkipSegment {
+  border-radius: var(--lg-radius-pill) !important;
+  background: var(--lg-tint-osd) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  border: var(--lg-border-strong) !important;
+  box-shadow: var(--lg-glass-shadow);
+  color: var(--lg-text) !important;
+  padding: 0.7em 1.4em;
+  font-weight: 600;
+  transition: transform var(--lg-dur-fast) var(--lg-spring),
+              background-color var(--lg-dur-fast) var(--lg-ease),
+              opacity var(--lg-dur) var(--lg-ease);
+}
+.skip-button:hover,
+.btnSkipSegment:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  transform: scale(1.04);
+}
+
+/* --------------------------------------------------------------------------
+   6. Subtitles: keep native rendering, add gentle legibility
+   -------------------------------------------------------------------------- */
+.videoSubtitlesInner {
+  border-radius: var(--lg-radius-xs);
+}
+
+/* --------------------------------------------------------------------------
+   7. Player track/speed/quality menus use .actionSheet (see core.css);
+      tighten them when shown over video.
+   -------------------------------------------------------------------------- */
+.videoPlayerContainer ~ .dialogContainer .actionSheet,
+.dialogContainer .actionSheet.centeredActionSheet {
+  max-height: 70vh;
+}
+
+/* --------------------------------------------------------------------------
+   8. Now-playing bar (music / remote control)
+   -------------------------------------------------------------------------- */
+.nowPlayingBar {
+  left: var(--lg-header-inset);
+  right: var(--lg-header-inset);
+  bottom: var(--lg-header-inset);
+  width: auto;
+  border-radius: var(--lg-radius-lg);
+  border: var(--lg-border);
+  background: var(--lg-tint) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg);
+  overflow: hidden;
+}
+.nowPlayingBar .nowPlayingImage {
+  border-radius: var(--lg-radius-sm);
+}
+.nowPlayingBarTop .mdl-slider-background-flex {
+  height: 3px;
+  margin-top: 0;
+}
+
+/* Remote control / full now-playing page */
+.nowPlayingPage .nowPlayingPageImage,
+.remoteControlContent .nowPlayingPageImage {
+  border-radius: var(--lg-radius-lg);
+  box-shadow: var(--lg-shadow-lg);
+}

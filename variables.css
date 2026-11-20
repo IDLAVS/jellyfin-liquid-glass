@@ -1,0 +1,118 @@
+/* ==========================================================================
+   CUSTOM BACKGROUND — change one line to swap the wallpaper
+   Any image URL works; files from IDLAVS/jellyfin-assets load through
+   jsDelivr:  https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/<file>
+   ========================================================================== */
+:root {
+  --custom-bg-url: url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/blackandwhite3840x2160.jpg");
+  --custom-bg-overlay-opacity: 0.45;  /* 0 = raw image, 1 = solid dark */
+  --custom-bg-blur: 0px;              /* e.g. 12px for a frosted wallpaper */
+}
+
+/* ==========================================================================
+   Liquid Glass — design tokens
+   Override any of these after the @import in Custom CSS, e.g.
+     :root { --lg-accent: 255 159 10; --lg-blur: 28px; }
+   ========================================================================== */
+
+:root {
+  /* ---- Accent (space-separated RGB so it can take alpha) ---------------- */
+  --lg-accent: 10 132 255;                 /* iOS system blue */
+  --lg-accent-solid: rgb(var(--lg-accent));
+  --lg-accent-soft: rgb(var(--lg-accent) / 0.22);
+
+  /* ---- Base surfaces ---------------------------------------------------- */
+  --lg-bg: #07080b;                        /* page background behind backdrops */
+  --lg-text: rgba(255, 255, 255, 0.96);
+  --lg-text-dim: rgba(235, 235, 245, 0.68);
+  --lg-text-faint: rgba(235, 235, 245, 0.42);
+
+  /* ---- Glass tints (dark-mode) ------------------------------------------ */
+  --lg-tint: rgba(28, 28, 32, 0.42);       /* floating chrome: header, OSD */
+  --lg-tint-strong: rgba(22, 22, 26, 0.66);/* dialogs, menus (text-heavy) */
+  --lg-tint-light: rgba(255, 255, 255, 0.08); /* buttons, chips, inputs */
+  --lg-tint-hover: rgba(255, 255, 255, 0.16);
+  --lg-tint-active: rgba(255, 255, 255, 0.24);
+  --lg-tint-card: rgba(255, 255, 255, 0.04);  /* poster cards (no blur) */
+  --lg-tint-osd: rgba(18, 18, 22, 0.56);   /* controls over live video: survives bright frames */
+
+  /* ---- Movie / show page backdrop scrim (top of page → scrolled) ------ */
+  --lg-detail-dim-start: rgba(7, 8, 11, 0.34);
+  --lg-detail-dim-end: rgba(7, 8, 11, 0.58);
+
+  /* ---- Blur / refraction ------------------------------------------------ */
+  --lg-blur: 24px;
+  --lg-blur-strong: 40px;
+  --lg-blur-sm: 12px;
+  --lg-saturate: 180%;
+  --lg-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
+  --lg-filter-strong: blur(var(--lg-blur-strong)) saturate(var(--lg-saturate));
+  --lg-filter-sm: blur(var(--lg-blur-sm)) saturate(160%);
+
+  /* ---- Specular edges --------------------------------------------------- */
+  --lg-border: 1px solid rgba(255, 255, 255, 0.14);
+  --lg-border-strong: 1px solid rgba(255, 255, 255, 0.22);
+  --lg-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.22);       /* top edge */
+  --lg-highlight-soft: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  --lg-inner-glow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+
+  /* ---- Shadows ---------------------------------------------------------- */
+  --lg-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --lg-shadow: 0 8px 32px rgba(0, 0, 0, 0.36);
+  --lg-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.5);
+
+  /* Composite "glass" shadow stacks */
+  --lg-glass-shadow: var(--lg-highlight), var(--lg-inner-glow), var(--lg-shadow);
+  --lg-glass-shadow-lg: var(--lg-highlight), var(--lg-inner-glow), var(--lg-shadow-lg);
+
+  /* ---- Geometry --------------------------------------------------------- */
+  --lg-radius-xs: 8px;
+  --lg-radius-sm: 12px;
+  --lg-radius: 18px;                       /* cards */
+  --lg-radius-lg: 24px;                    /* modals, OSD */
+  --lg-radius-pill: 9999px;
+
+  --lg-header-inset: 10px;                 /* gap between header pill and window edge */
+  --lg-header-height: 3.5em;
+
+  /* ---- Motion ----------------------------------------------------------- */
+  --lg-spring: cubic-bezier(0.34, 1.36, 0.64, 1);   /* slight overshoot */
+  --lg-ease: cubic-bezier(0.22, 1, 0.36, 1);        /* smooth decel */
+  --lg-dur-fast: 160ms;
+  --lg-dur: 280ms;
+  --lg-dur-slow: 460ms;
+
+  /* ---- Focus (keyboard / D-pad / controller) ------------------------- */
+  --lg-focus-ring:
+    0 0 0 2px rgba(255, 255, 255, 0.95),
+    0 0 0 5px rgb(var(--lg-accent) / 0.55),
+    0 0 26px 4px rgb(var(--lg-accent) / 0.45);
+  --lg-focus-scale: 1.04;
+
+  /* ---- TV / console safe area (overscan) ---------------------------- */
+  --lg-tv-safe-x: 3vw;
+  --lg-tv-safe-y: 3vh;
+
+  /* ---- Z layers --------------------------------------------------------- */
+  --lg-z-header: 1000;
+  --lg-z-osd: 1001;
+  --lg-z-dialog: 1100;
+  --lg-z-toast: 1200;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --lg-dur-fast: 0ms;
+    --lg-dur: 0ms;
+    --lg-dur-slow: 0ms;
+  }
+}
+
+/* Lower-end / touch devices: cheaper blur */
+@media (max-width: 50em) {
+  :root {
+    --lg-blur: 18px;
+    --lg-blur-strong: 26px;
+    --lg-header-inset: 6px;
+  }
+}

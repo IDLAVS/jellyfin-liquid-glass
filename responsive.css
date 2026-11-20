@@ -1,0 +1,453 @@
+/* ==========================================================================
+   Liquid Glass — responsive & input-mode adaptations
+   1. Keyboard / D-pad / controller focus (all devices)
+   2. Touch devices (no hover)
+   3. Phones (≤ 768px, portrait & landscape)
+   4. TV / Xbox 10-foot UI (.layout-tv)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Focus — glowing specular ring + lift, only for keyboard / remote focus
+      (:focus-visible), plus Jellyfin's TV layout where every focus counts.
+   -------------------------------------------------------------------------- */
+
+/* Jellyfin sets contain:content on every card, which clips anything drawn
+   outside the card box (focus glow, lift). Relax it only on the one card
+   that is hovered / focused, and raise it above its neighbours. */
+.card:hover,
+.card:focus-visible,
+.card:has(:focus-visible),
+.layout-tv .card:focus,
+.layout-tv .card:focus-within {
+  contain: layout style;
+  position: relative;
+  z-index: 2;
+}
+
+/* Cards: ring goes on the artwork, the box lifts */
+.card:focus-visible .cardScalable,
+.card:has(:focus-visible) .cardScalable,
+.layout-tv .card:focus .cardScalable,
+.layout-tv .card:focus-within .cardScalable {
+  box-shadow: var(--lg-focus-ring) !important;
+}
+.card:focus-visible .cardBox,
+.card:has(:focus-visible) .cardBox,
+.layout-tv .card:focus .cardBox,
+.layout-tv .card:focus-within .cardBox {
+  transform: translateY(-4px) scale(var(--lg-focus-scale));
+}
+.card:focus-visible,
+.card :focus-visible {
+  outline: none;
+}
+
+/* Pills, buttons, icon buttons, list rows, menu items */
+:is(
+  .emby-tab-button,
+  .emby-button,
+  .button-flat,
+  .raised,
+  .paper-icon-button-light,
+  .headerButton,
+  header.MuiAppBar-root .MuiButton-root,
+  header.MuiAppBar-root .MuiIconButton-root,
+  .MuiMenuItem-root,
+  .MuiListItemButton-root,
+  .navMenuOption,
+  .listItem,
+  .actionSheetMenuItem,
+  .alphaPickerButton,
+  .emby-scrollbuttons-button,
+  .detailButton,
+  .emby-input,
+  .emby-select,
+  .emby-select-withcolor
+):focus-visible,
+.layout-tv :is(
+  .emby-tab-button,
+  .emby-button,
+  .button-flat,
+  .raised,
+  .paper-icon-button-light,
+  .headerButton,
+  .navMenuOption,
+  .listItem,
+  .actionSheetMenuItem,
+  .alphaPickerButton,
+  .detailButton
+):focus {
+  outline: none !important;
+  box-shadow: var(--lg-focus-ring) !important;
+  background-color: var(--lg-tint-active);
+  transform: scale(var(--lg-focus-scale));
+  transition: box-shadow var(--lg-dur-fast) var(--lg-ease),
+              transform var(--lg-dur-fast) var(--lg-spring),
+              background-color var(--lg-dur-fast) var(--lg-ease);
+}
+/* Rows don't scale (they'd clip in scrollers) — ring only */
+:is(.listItem, .actionSheetMenuItem, .MuiMenuItem-root, .navMenuOption, .emby-input, .emby-select, .emby-select-withcolor):focus-visible,
+.layout-tv :is(.listItem, .actionSheetMenuItem, .navMenuOption):focus {
+  transform: none;
+}
+
+/* Video OSD controls + sliders */
+.videoOsdBottom .paper-icon-button-light:focus-visible,
+.layout-tv .videoOsdBottom .paper-icon-button-light:focus {
+  box-shadow: var(--lg-focus-ring) !important;
+  background-color: var(--lg-tint-active) !important;
+  transform: scale(1.1);
+}
+.mdl-slider:focus-visible::-webkit-slider-thumb,
+.layout-tv .mdl-slider:focus::-webkit-slider-thumb {
+  box-shadow: var(--lg-focus-ring);
+  transform: scale(1.35);
+}
+.mdl-slider-container:focus-within .mdl-slider-background-flex {
+  height: 9px;
+  margin-top: -4.5px;
+}
+
+/* Plugins */
+#slides-container .button-container button:focus-visible,
+#slides-container .arrow:focus-visible,
+#slides-container .ss-chrome:focus-visible,
+.layout-tv #slides-container .button-container button:focus,
+.layout-tv #slides-container .arrow:focus,
+#slides-container:focus-visible .button-container .play-button,
+.skip-button:focus-visible,
+.btnSkipSegment:focus-visible,
+#skipIntro button:focus-visible,
+.skipIntro button:focus-visible,
+.layout-tv .skip-button:focus,
+.layout-tv #skipIntro button:focus,
+.layout-tv .skipIntro button:focus,
+.previewListItem:focus-visible,
+.previewListItem:focus-within,
+.previewQuickActionContainer button:focus-visible,
+.layout-tv .previewListItem:focus,
+[class*="je-"] :is(button, a):focus-visible,
+:is(button, a)[class*="je-"]:focus-visible,
+#randomItemButton:focus-visible,
+.layout-tv [class*="je-"] :is(button, a):focus,
+.layout-tv #randomItemButton:focus {
+  outline: none !important;
+  box-shadow: var(--lg-focus-ring) !important;
+}
+#slides-container .button-container button:focus-visible,
+.layout-tv #slides-container .button-container button:focus,
+.skip-button:focus-visible,
+.layout-tv .skip-button:focus,
+#skipIntro button:focus-visible,
+.layout-tv #skipIntro button:focus {
+  transform: scale(var(--lg-focus-scale));
+}
+/* Moonfin's own stylesheet forces box-shadow:none !important on focus */
+button.headerMoonfinButton.headerMoonfinButton:focus-visible,
+.layout-tv button.headerMoonfinButton.headerMoonfinButton:focus {
+  opacity: 1 !important;
+  box-shadow: var(--lg-focus-ring) !important;
+  background-color: var(--lg-tint-active) !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. Touch devices — no sticky hover, tactile press instead
+   -------------------------------------------------------------------------- */
+@media (hover: none) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .card-hoverable:hover .cardBox,
+  .card:hover .cardBox {
+    transform: none;
+  }
+  .card-hoverable:hover .cardScalable {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), var(--lg-shadow-sm);
+  }
+  .card:active .cardBox {
+    transform: scale(0.97);
+    transition-duration: 90ms;
+  }
+
+  :is(.headerButton, .paper-icon-button-light, .button-flat, .emby-tab-button,
+      .emby-button.raised, .raised, .listItem, .navMenuOption,
+      .actionSheetMenuItem, .cardOverlayButton,
+      header.MuiAppBar-root .MuiButton-root,
+      header.MuiAppBar-root .MuiIconButton-root):hover:not(:focus-visible) {
+    background-color: transparent;
+    transform: none;
+  }
+  .emby-tab-button-active:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+  :is(.mainDetailButtons .detailButton, #slides-container .button-container button,
+      .skip-button, .videoOsdBottom .paper-icon-button-light):hover {
+    transform: none;
+  }
+  :is(.headerButton, .paper-icon-button-light, .detailButton, .emby-button,
+      .cardOverlayButton, #slides-container .button-container button,
+      .skip-button):active {
+    transform: scale(0.92);
+    transition-duration: 90ms;
+  }
+
+  /* Scrubber thumb always visible and finger-sized */
+  .mdl-slider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Phones (portrait & landscape)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px), (max-height: 500px) and (hover: none) {
+  :root {
+    --lg-header-inset: 6px;
+    --lg-blur: 16px;
+    --lg-blur-strong: 22px;
+    --lg-radius: 14px;
+    --lg-radius-lg: 20px;
+  }
+
+  /* Header capsule clears the notch / status bar */
+  header.MuiAppBar-root.MuiAppBar-positionFixed {
+    top: calc(env(safe-area-inset-top, 0px) + var(--lg-header-inset));
+    left: max(var(--lg-header-inset), env(safe-area-inset-left, 0px));
+    right: max(var(--lg-header-inset), env(safe-area-inset-right, 0px));
+    border-radius: var(--lg-radius-lg);
+  }
+  header.MuiAppBar-root .MuiToolbar-root {
+    min-height: 48px;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    gap: 0;
+  }
+  /* Nav pills scroll sideways instead of overflowing */
+  header.MuiAppBar-root .MuiToolbar-root > .MuiStack-root {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+  header.MuiAppBar-root .MuiToolbar-root > .MuiStack-root::-webkit-scrollbar {
+    display: none;
+  }
+  header.MuiAppBar-root .MuiButton-root {
+    padding-left: 0.7em;
+    padding-right: 0.7em;
+    min-width: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  header.MuiAppBar-root .MuiIconButton-root,
+  header.MuiAppBar-root .headerButton {
+    padding: 6px;
+  }
+  header.MuiAppBar-root.MuiAppBar-positionFixed + div {
+    margin-bottom: calc(env(safe-area-inset-top, 0px) + var(--lg-header-inset) * 2);
+  }
+
+  /* Classic header */
+  .skinHeader:not(.MuiBox-root):not(.osdHeader) {
+    top: calc(env(safe-area-inset-top, 0px) + var(--lg-header-inset));
+  }
+
+  /* Search: full-width pill */
+  .searchFields .inputContainer,
+  .searchFieldsInner {
+    max-width: none;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+  }
+  .searchFields .emby-input,
+  #searchPage .emby-input {
+    font-size: 16px; /* stops iOS zoom-on-focus */
+  }
+
+  /* Grids: slightly tighter radius & shadow on small posters */
+  .cardScalable {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+  .cardScalable::after {
+    opacity: 0.6;
+  }
+  .alphaPicker {
+    padding: 0.2em 0;
+  }
+
+  /* Detail page buttons wrap cleanly and stay finger-sized */
+  .mainDetailButtons {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35em;
+  }
+  .mainDetailButtons .detailButton {
+    margin: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* Dialogs: full-bleed sheets keep a rounded top */
+  .dialog.dialog-fullscreen-lowres {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .actionSheet:not(.dialog-fullscreen-lowres) {
+    max-width: calc(100vw - 16px);
+  }
+
+  /* Video OSD: edge-to-edge capsule above the home indicator */
+  .videoOsdBottom.videoOsdBottom-maincontrols {
+    left: max(8px, env(safe-area-inset-left, 0px));
+    right: max(8px, env(safe-area-inset-right, 0px));
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    max-width: none;
+    padding: 0.4em 0.6em 0.35em;
+    border-radius: var(--lg-radius-lg);
+  }
+  .videoOsdBottom .buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 0.1em;
+  }
+  .videoOsdBottom .osdVolumeSliderContainer,
+  .videoOsdBottom .volumeSliderContainer {
+    display: none; /* phones use hardware volume */
+  }
+  .skinHeader.osdHeader {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Skip button & episode preview sit above the capsule */
+  #skipIntro,
+  .skipIntro,
+  .skip-button {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8.5em);
+    right: max(12px, env(safe-area-inset-right, 0px));
+  }
+  .dialog.previewPopup {
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 9em) !important;
+  }
+
+  /* Now-playing bar */
+  .nowPlayingBar {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--lg-header-inset));
+  }
+
+  /* Media Bar (touch card layout) */
+  #slides-container .button-container button {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  #slides-container .ss-chrome,
+  #slides-container .arrow {
+    z-index: 10;
+  }
+  #slides-container .spec-line {
+    flex-wrap: wrap;
+    row-gap: 0.35em;
+  }
+  #slides-container .spec-item,
+  #slides-container .spec-cert {
+    white-space: nowrap;
+  }
+  #slides-container .dots-container {
+    margin-left: 0; /* the plugin centres dots on phones */
+  }
+}
+
+/* Phone landscape: short screen — slimmer chrome */
+@media (max-height: 500px) and (orientation: landscape) and (hover: none) {
+  header.MuiAppBar-root .MuiToolbar-root {
+    min-height: 42px;
+  }
+  .videoOsdBottom.videoOsdBottom-maincontrols {
+    left: max(16px, env(safe-area-inset-left, 0px));
+    right: max(16px, env(safe-area-inset-right, 0px));
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
+  }
+  .videoOsdBottom .buttons {
+    flex-wrap: nowrap;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. TV / Xbox 10-foot UI
+      Jellyfin's Xbox app and TV display mode add .layout-tv to <html>.
+   -------------------------------------------------------------------------- */
+.layout-tv {
+  /* GPU budget for Xbox Edge WebView2: lighter blur, no saturate pass */
+  --lg-blur: 14px;
+  --lg-blur-strong: 18px;
+  --lg-blur-sm: 0px;
+  --lg-filter: blur(var(--lg-blur));
+  --lg-filter-strong: blur(var(--lg-blur-strong));
+  --lg-filter-sm: none;
+  --lg-tint: rgba(24, 24, 28, 0.62);
+  --lg-tint-strong: rgba(20, 20, 24, 0.8);
+  --lg-focus-scale: 1.07;
+  --lg-header-inset: var(--lg-tv-safe-y);
+}
+
+/* Overscan-safe chrome */
+.layout-tv header.MuiAppBar-root.MuiAppBar-positionFixed,
+.layout-tv .skinHeader:not(.MuiBox-root):not(.osdHeader) {
+  top: var(--lg-tv-safe-y);
+  left: var(--lg-tv-safe-x);
+  right: var(--lg-tv-safe-x);
+}
+.layout-tv .mainAnimatedPage {
+  left: var(--lg-tv-safe-x);
+  right: var(--lg-tv-safe-x);
+}
+.layout-tv .videoOsdBottom.videoOsdBottom-maincontrols {
+  left: calc(var(--lg-tv-safe-x) + 2vw);
+  right: calc(var(--lg-tv-safe-x) + 2vw);
+  bottom: calc(var(--lg-tv-safe-y) + 1vh);
+  max-width: none;
+}
+.layout-tv .skinHeader.osdHeader {
+  padding: var(--lg-tv-safe-y) var(--lg-tv-safe-x) 0;
+}
+.layout-tv #skipIntro,
+.layout-tv .skipIntro,
+.layout-tv .skip-button {
+  right: calc(var(--lg-tv-safe-x) + 2vw);
+  bottom: calc(var(--lg-tv-safe-y) + 9em);
+}
+.layout-tv .dialog.previewPopup {
+  right: calc(var(--lg-tv-safe-x) + 2vw);
+  bottom: calc(var(--lg-tv-safe-y) + 10em) !important;
+}
+
+/* Expensive effects off: no blur on scrolling/small elements, no
+   will-change on hundreds of cards, no hover-only transitions */
+.layout-tv .cardBox {
+  will-change: auto;
+}
+.layout-tv :is(.mainDetailButtons .detailButton, #slides-container .button-container button,
+               #slides-container .arrow, #slides-container .ss-chrome,
+               #slides-container .featured-content, #slides-container .dots-container,
+               .MuiTooltip-tooltip, #pause-screen-close-btn) {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.layout-tv .backgroundContainer::before {
+  filter: none; /* a blurred 4K wallpaper is costly on console GPUs */
+}
+
+/* Bigger, clearer focus on a 10-foot screen */
+.layout-tv .card:focus .cardScalable,
+.layout-tv .card:focus-within .cardScalable {
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 0 7px rgb(var(--lg-accent) / 0.55),
+    0 0 36px 8px rgb(var(--lg-accent) / 0.45) !important;
+}

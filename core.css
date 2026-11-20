@@ -1,0 +1,1098 @@
+/* ==========================================================================
+   Liquid Glass — core UI
+   Header · drawer · cards · detail pages · search · forms · dialogs · menus
+   Rule of thumb: backdrop-filter only on fixed/floating layers.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Base & backdrop stability (no flash between pages)
+   -------------------------------------------------------------------------- */
+html,
+body {
+  background-color: var(--lg-bg);
+}
+
+.backgroundContainer {
+  background-color: var(--lg-bg);
+}
+
+/* Custom wallpaper (--custom-bg-url)
+   Painted on two fixed pseudo-layers of .backgroundContainer so it never
+   touches Jellyfin's own backdrop elements:
+     ::before  the image (optionally blurred; oversized so blur has no edge)
+     ::after   the darkening overlay
+   It cross-fades out whenever fanart is showing (Jellyfin backdrops on
+   detail pages = .withBackdrop, or Media Bar's page backdrop = inline url)
+   and is switched off entirely behind the video player. The layers always
+   exist, so page changes fade instead of flashing. */
+.backgroundContainer {
+  overflow: hidden;
+  isolation: isolate;
+}
+.backgroundContainer::before,
+.backgroundContainer::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  transition: opacity var(--lg-dur-slow) var(--lg-ease);
+}
+.backgroundContainer::before {
+  inset: calc(var(--custom-bg-blur) * -2);
+  background: var(--custom-bg-url) center / cover no-repeat;
+  filter: blur(var(--custom-bg-blur));
+}
+.backgroundContainer::after {
+  inset: 0;
+  background: rgb(7 8 11 / var(--custom-bg-overlay-opacity));
+}
+.backgroundContainer.withBackdrop::before,
+.backgroundContainer.withBackdrop::after,
+.backgroundContainer[style*="url("]::before,
+.backgroundContainer[style*="url("]::after {
+  opacity: 0;
+}
+.backgroundContainer-transparent::before,
+.backgroundContainer-transparent::after,
+.transparentDocument .backgroundContainer::before,
+.transparentDocument .backgroundContainer::after {
+  display: none;
+}
+
+/* Readability scrim over item backdrops: darker toward the bottom */
+.backgroundContainer.withBackdrop {
+  background: linear-gradient(180deg,
+      rgba(7, 8, 11, 0.35) 0%,
+      rgba(7, 8, 11, 0.62) 45%,
+      rgba(7, 8, 11, 0.88) 100%);
+}
+
+.backdropImage {
+  transition: opacity var(--lg-dur-slow) var(--lg-ease);
+}
+
+::selection {
+  background: rgb(var(--lg-accent) / 0.45);
+}
+
+/* Slim glass scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border: 3px solid transparent;
+  border-radius: var(--lg-radius-pill);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.28);
+}
+
+/* --------------------------------------------------------------------------
+   1. Floating header capsule
+   -------------------------------------------------------------------------- */
+/* Classic header only — the React layout reuses .skinHeader on an in-flow
+   MuiBox (video OSD header), which must not get fixed-position geometry */
+.skinHeader:not(.MuiBox-root) {
+  top: var(--lg-header-inset);
+  left: var(--lg-header-inset);
+  right: var(--lg-header-inset);
+  width: auto;
+  border-radius: var(--lg-radius-lg);
+  border: var(--lg-border);
+  box-shadow: var(--lg-glass-shadow);
+  transition: transform var(--lg-dur) var(--lg-ease),
+              background-color var(--lg-dur) var(--lg-ease),
+              opacity var(--lg-dur) var(--lg-ease);
+}
+
+.skinHeader.skinHeader-withBackground,
+.skinHeader.skinHeader-blurred,
+.skinHeader.semiTransparent {
+  background: var(--lg-tint) !important; /* Jellyfin sets this per page */
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+/* When Jellyfin hides the header on scroll, clear the inset too */
+.skinHeader.headroom--unpinned {
+  transform: translateY(calc(-100% - var(--lg-header-inset) - 8px));
+}
+
+/* Transparent header (e.g. login) — keep it chrome-free */
+.skinHeader.noHeaderRight:not(.skinHeader-withBackground),
+.skinHeader-transparent {
+  background: transparent !important;
+  border-color: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.headerTop {
+  padding: 0.35em 0.6em;
+}
+
+/* Header icon buttons: soft circular glass on hover */
+.headerButton {
+  border-radius: var(--lg-radius-pill);
+  transition: background-color var(--lg-dur-fast) var(--lg-ease),
+              transform var(--lg-dur-fast) var(--lg-spring);
+}
+.headerButton:hover {
+  background-color: var(--lg-tint-hover);
+}
+.headerButton:active {
+  transform: scale(0.92);
+}
+
+.headerUserButtonRound,
+.headerUserButtonRound > div {
+  border-radius: 50%;
+}
+.headerUserButton > .headerUserButtonRound {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+/* Header tabs as a segmented pill */
+.headerTabs {
+  padding-bottom: 0.45em;
+}
+.headerTabs .emby-tabs-slider,
+.sectionTabs .emby-tabs-slider {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--lg-radius-pill);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: var(--lg-highlight-soft);
+}
+.emby-tab-button {
+  border-radius: var(--lg-radius-pill);
+  padding: 0.55em 1.15em;
+  color: var(--lg-text-dim);
+  transition: background-color var(--lg-dur) var(--lg-ease),
+              color var(--lg-dur) var(--lg-ease);
+}
+.emby-tab-button:hover {
+  color: var(--lg-text);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.emby-tab-button-active,
+.emby-tab-button.emby-tab-button-active {
+  color: var(--lg-text);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: var(--lg-highlight), 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+/* hide the material underline */
+.emby-tab-button-active::after,
+.emby-tabs-slider .emby-tab-button::after {
+  display: none;
+}
+
+/* Push page content below the floating header */
+.libraryPage:not(.noSecondaryNavPage),
+.page.libraryPage {
+  padding-top: calc(var(--lg-header-height) + var(--lg-header-inset) * 2 + 0.5em);
+}
+.libraryPage.withTabs:not(.noSecondaryNavPage) {
+  padding-top: calc(var(--lg-header-height) + 3em + var(--lg-header-inset) * 2);
+}
+
+/* --------------------------------------------------------------------------
+   2. Navigation drawer
+   -------------------------------------------------------------------------- */
+.mainDrawer {
+  top: var(--lg-header-inset);
+  bottom: var(--lg-header-inset);
+  left: var(--lg-header-inset);
+  height: auto;
+  border-radius: var(--lg-radius-lg);
+  border: var(--lg-border);
+  background: var(--lg-tint-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg);
+  overflow: hidden;
+}
+.mainDrawer-scrollContainer {
+  padding: 0.5em 0;
+}
+.navMenuOption {
+  margin: 1px 0.6em;
+  border-radius: var(--lg-radius-sm);
+  transition: background-color var(--lg-dur-fast) var(--lg-ease);
+}
+.navMenuOption:hover {
+  background-color: var(--lg-tint-hover);
+}
+.navMenuOption-selected {
+  background: var(--lg-accent-soft) !important;
+  color: var(--lg-text) !important;
+  box-shadow: var(--lg-highlight-soft);
+}
+.navMenuOption-selected .navMenuOptionIcon {
+  color: var(--lg-accent-solid);
+}
+.sidebarHeader {
+  color: var(--lg-text-faint);
+  letter-spacing: 0.04em;
+}
+.mainDrawerHandle {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   3. Section titles & scrollers
+   -------------------------------------------------------------------------- */
+.sectionTitle {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+}
+.sectionTitle-cards > a.button-flat,
+.sectionTitleTextButton {
+  border-radius: var(--lg-radius-pill);
+}
+
+/* Scroller arrows → glass circles */
+.emby-scrollbuttons-button {
+  border-radius: 50%;
+  background: var(--lg-tint-light);
+  border: var(--lg-border);
+  box-shadow: var(--lg-highlight-soft);
+}
+.emby-scrollbuttons-button:hover {
+  background: var(--lg-tint-hover);
+}
+
+/* --------------------------------------------------------------------------
+   4. Cards (high count → no backdrop-filter)
+   -------------------------------------------------------------------------- */
+.cardBox {
+  transition: transform var(--lg-dur) var(--lg-spring);
+  will-change: transform;
+}
+
+.cardScalable,
+.cardImageContainer,
+.cardContent,
+.cardOverlayContainer,
+.blurhash-canvas {
+  border-radius: var(--lg-radius);
+}
+
+.cardScalable {
+  overflow: hidden;
+  background: var(--lg-tint-card);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08),
+              var(--lg-shadow-sm);
+  transition: box-shadow var(--lg-dur) var(--lg-ease);
+  isolation: isolate;
+}
+
+/* Specular top edge drawn over the artwork */
+.cardScalable::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0) 28%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  opacity: 0.85;
+  transition: opacity var(--lg-dur) var(--lg-ease);
+}
+
+/* Hover elevation (pointer devices only) */
+@media (hover: hover) and (pointer: fine) {
+  .card-hoverable:hover .cardBox,
+  .card:focus-visible .cardBox {
+    transform: translateY(-4px) scale(1.025);
+  }
+  .card-hoverable:hover .cardScalable,
+  .card:focus-visible .cardScalable {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2),
+                0 18px 40px rgba(0, 0, 0, 0.5);
+  }
+  .card-hoverable:hover .cardScalable::after {
+    opacity: 1;
+  }
+}
+
+/* Jellyfin TV-style focus scale — replace with the spring lift */
+.card:focus .cardBox.visualCardBox,
+.card:focus .cardBox:not(.visualCardBox) {
+  transform: translateY(-4px) scale(1.025);
+}
+.card:focus .cardScalable {
+  box-shadow: 0 0 0 2px rgb(var(--lg-accent) / 0.85), var(--lg-shadow);
+}
+
+/* Overlay buttons on hover (play / more) */
+.cardOverlayContainer {
+  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+}
+.cardOverlayButton {
+  border-radius: 50%;
+  background: rgba(20, 20, 24, 0.5);
+  border: var(--lg-border);
+  box-shadow: var(--lg-highlight-soft);
+  transition: transform var(--lg-dur-fast) var(--lg-spring),
+              background-color var(--lg-dur-fast) var(--lg-ease);
+}
+.cardOverlayButton:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Visual card boxes (list/grid with footer inside the box) */
+.visualCardBox {
+  border-radius: var(--lg-radius);
+  background: var(--lg-tint-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+/* Text */
+.cardText {
+  color: var(--lg-text);
+}
+.cardText-secondary,
+.cardText-first + .cardText {
+  color: var(--lg-text-dim);
+}
+
+/* Indicators (played / count / progress) */
+.countIndicator,
+.playedIndicator,
+.indicator {
+  background: rgb(var(--lg-accent) / 0.92);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25), var(--lg-shadow-sm);
+}
+.itemProgressBar,
+.cardProgressBar {
+  height: 5px;
+  border-radius: var(--lg-radius-pill);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.2);
+}
+.itemProgressBarForeground {
+  border-radius: var(--lg-radius-pill);
+  background: var(--lg-accent-solid);
+}
+.innerCardFooter {
+  border-radius: 0 0 var(--lg-radius) var(--lg-radius);
+  background: rgba(10, 10, 12, 0.55);
+}
+
+/* People / cast cards: circular portrait */
+.personCard .cardScalable,
+.personCard .cardImageContainer,
+.personCard .cardContent,
+.personCard .cardOverlayContainer,
+.personCard .blurhash-canvas {
+  border-radius: 50%;
+}
+
+/* --------------------------------------------------------------------------
+   5. Buttons, chips & form controls
+   -------------------------------------------------------------------------- */
+.emby-button.raised,
+.raised,
+.button-flat.btnFilter,
+.button-flat.btnSort,
+.btnPlay.button-flat,
+.btnShuffle.button-flat {
+  border-radius: var(--lg-radius-pill);
+}
+
+.emby-button.raised,
+.raised {
+  background: var(--lg-tint-light);
+  color: var(--lg-text);
+  border: var(--lg-border);
+  box-shadow: var(--lg-highlight-soft), var(--lg-shadow-sm);
+  transition: background-color var(--lg-dur-fast) var(--lg-ease),
+              transform var(--lg-dur-fast) var(--lg-spring);
+}
+.emby-button.raised:hover,
+.raised:hover {
+  background: var(--lg-tint-hover);
+}
+.emby-button:active {
+  transform: scale(0.97);
+}
+
+.button-submit,
+.emby-button.button-submit {
+  background: var(--lg-accent-solid);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
+              0 6px 18px rgb(var(--lg-accent) / 0.35);
+}
+.button-submit:hover {
+  background: rgb(var(--lg-accent) / 0.85);
+}
+.button-delete,
+.emby-button.button-delete {
+  background: rgba(255, 69, 58, 0.85);
+}
+
+.button-flat {
+  border-radius: var(--lg-radius-sm);
+}
+.button-flat:hover {
+  background-color: var(--lg-tint-hover);
+}
+
+.paper-icon-button-light {
+  border-radius: 50%;
+}
+.paper-icon-button-light:hover:not(:disabled) {
+  background-color: var(--lg-tint-hover);
+}
+
+/* Inputs & selects */
+.emby-input,
+.emby-textarea,
+.emby-select-withcolor,
+.emby-select {
+  background: rgba(255, 255, 255, 0.07);
+  border: var(--lg-border);
+  border-radius: var(--lg-radius-sm);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+  color: var(--lg-text);
+  transition: border-color var(--lg-dur-fast) var(--lg-ease),
+              box-shadow var(--lg-dur-fast) var(--lg-ease);
+}
+.emby-input:focus,
+.emby-textarea:focus,
+.emby-select-withcolor:focus,
+.emby-select:focus {
+  border-color: rgb(var(--lg-accent) / 0.8);
+  box-shadow: 0 0 0 3px rgb(var(--lg-accent) / 0.25);
+}
+.emby-select-withcolor > option,
+.emby-select > option {
+  background: #1c1c20;
+  color: var(--lg-text);
+}
+
+/* Checkbox & toggle accent */
+.emby-checkbox:checked + span + .checkboxOutline,
+.emby-checkbox:checked + .checkboxLabel + .checkboxOutline {
+  background-color: var(--lg-accent-solid);
+  border-color: var(--lg-accent-solid);
+}
+.checkboxOutline {
+  border-radius: 6px;
+}
+.mdl-switch__track {
+  border-radius: var(--lg-radius-pill);
+}
+.mdl-switch.is-checked .mdl-switch__track {
+  background: var(--lg-accent-solid);
+}
+.mdl-switch.is-checked .mdl-switch__thumb {
+  background: #fff;
+}
+
+/* Library toolbar (filter / sort / paging) as pills */
+.flex.align-items-center.justify-content-center.flex-wrap-wrap.padded-top.padded-left.padded-right.padded-bottom.focuscontainer-x,
+.listTopPaging {
+  gap: 0.25em;
+}
+.btnFilter,
+.btnSort,
+.btnSelectView,
+.btnShuffle,
+.btnPlay,
+.btnNewCollection,
+.btnNewPlaylist {
+  border-radius: var(--lg-radius-pill);
+}
+.paging .paginationButton,
+.paging button {
+  border-radius: 50%;
+}
+
+/* Alphabet picker */
+.alphaPicker {
+  border-radius: var(--lg-radius-pill);
+  background: var(--lg-tint-light);
+  border: var(--lg-border);
+  box-shadow: var(--lg-highlight-soft);
+  padding: 0.35em 0.15em;
+}
+.alphaPickerButton {
+  border-radius: var(--lg-radius-pill);
+}
+.alphaPickerButton-selected {
+  background: var(--lg-accent-solid);
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   6. Search
+   -------------------------------------------------------------------------- */
+.searchFields .inputContainer,
+.searchFieldsInner {
+  max-width: 40em;
+  margin-left: auto;
+  margin-right: auto;
+}
+.searchFields .emby-input,
+.searchFieldsInner .emby-input,
+#searchPage .emby-input {
+  border-radius: var(--lg-radius-pill);
+  padding-left: 1.2em;
+  padding-right: 1.2em;
+  background: var(--lg-tint-light);
+  border: var(--lg-border-strong);
+  box-shadow: var(--lg-highlight-soft), var(--lg-shadow-sm);
+}
+.searchfields-icon {
+  color: var(--lg-text-dim);
+}
+/* Suggestions / quick links */
+.searchSuggestions .button-link,
+.searchSuggestions a {
+  border-radius: var(--lg-radius-pill);
+}
+
+/* --------------------------------------------------------------------------
+   7. Item detail page
+   -------------------------------------------------------------------------- */
+.itemBackdrop {
+  border-radius: 0 0 var(--lg-radius-lg) var(--lg-radius-lg);
+}
+
+/* Full-page backdrop on movie / show pages
+   Jellyfin already paints the item's backdrop full-window and fixed in
+   .backdropContainer (Display → Backdrops on). Two things normally hide it:
+   the #101010 slab behind .detailPageWrapperContainer and an 86% scrim on
+   .backgroundContainer. Clear the slab, lighten the scrim while a detail
+   page is open, and deepen it as you scroll (scroll-driven, where supported). */
+.page.itemDetailPage .detailPageWrapperContainer,
+.page.itemDetailPage .detailPagePrimaryContainer,
+.page.itemDetailPage .detailPageSecondaryContainer {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+.backgroundContainer.withBackdrop:has(~ * .itemDetailPage:not(.hide)) {
+  opacity: 1 !important;
+  /* no !important here: it would block the scroll-driven animation below */
+  background-color: var(--lg-detail-dim-start, rgba(7, 8, 11, 0.34));
+  background-image: linear-gradient(180deg,
+      rgba(7, 8, 11, 0.40) 0%,
+      rgba(7, 8, 11, 0.18) 28%,
+      rgba(7, 8, 11, 0.50) 68%,
+      rgba(7, 8, 11, 0.82) 100%) !important;
+  transition: background-color var(--lg-dur-slow) var(--lg-ease);
+}
+@supports (animation-timeline: scroll()) {
+  .backgroundContainer.withBackdrop:has(~ * .itemDetailPage:not(.hide)) {
+    animation: lg-detail-dim linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 80vh;
+  }
+  @keyframes lg-detail-dim {
+    from { background-color: var(--lg-detail-dim-start, rgba(7, 8, 11, 0.34)); }
+    to   { background-color: var(--lg-detail-dim-end, rgba(7, 8, 11, 0.58)); }
+  }
+}
+
+/* Text legibility over the full-page artwork */
+.itemDetailPage .overview,
+.itemDetailPage .overview-text,
+.itemDetailPage .itemMiscInfo,
+.itemDetailPage .itemTags,
+.itemDetailPage .itemGenres,
+.itemDetailPage .itemExternalLinks,
+.itemDetailPage .detailsGroupItem,
+.itemDetailPage .sectionTitle,
+.itemDetailPage .cardText {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 14px rgba(0, 0, 0, 0.45);
+}
+
+/* "Details banner" mode: when Jellyfin puts the image on .itemBackdrop
+   instead, paint it full-window and fixed too (the element stays as the
+   spacer above the title). */
+.itemDetailPage .itemBackdrop[style*="background-image"] {
+  background-size: 0 0 !important;
+  background-color: transparent !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+.itemDetailPage .itemBackdrop[style*="background-image"]::before,
+.itemDetailPage .itemBackdrop[style*="background-image"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.itemDetailPage .itemBackdrop[style*="background-image"]::before {
+  background-image: inherit;
+  background-size: cover;
+  background-position: center 20%;
+  background-repeat: no-repeat;
+}
+.itemDetailPage .itemBackdrop[style*="background-image"]::after {
+  background: linear-gradient(180deg,
+      rgba(7, 8, 11, 0.40) 0%,
+      rgba(7, 8, 11, 0.18) 28%,
+      rgba(7, 8, 11, 0.55) 68%,
+      rgba(7, 8, 11, 0.85) 100%);
+}
+.itemDetailPage .detailLogo {
+  z-index: 1;
+}
+.itemDetailPage .detailPageWrapperContainer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ribbon behind title & buttons: let the backdrop show through */
+.itemDetailPage .detailRibbon {
+  background: transparent !important;
+  border: 0;
+  box-shadow: none;
+}
+
+.detailPagePrimaryContainer,
+.detailPageContent {
+  color: var(--lg-text);
+}
+.itemName,
+.parentNameLast {
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+}
+.itemMiscInfo,
+.itemMiscInfo-primary,
+.itemMiscInfo-secondary {
+  color: var(--lg-text-dim);
+}
+.mediaInfoItem,
+.mediaInfoOfficialRating,
+.mediaInfoCriticRating {
+  border-radius: 6px;
+}
+.mediaInfoOfficialRating {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Long titles: wrap to two lines instead of a hard ellipsis */
+.detailRibbon .infoWrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.detailRibbon .itemName.infoText {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.15;
+}
+
+/* Primary poster on detail page */
+.detailImageContainer .card .cardScalable {
+  border-radius: var(--lg-radius);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), var(--lg-shadow-lg);
+}
+
+/* Action buttons → circular glass (few elements: light blur allowed) */
+.mainDetailButtons .detailButton,
+.mainDetailButtons .button-flat {
+  border-radius: var(--lg-radius-pill);
+  background: rgba(255, 255, 255, 0.10);
+  border: var(--lg-border);
+  -webkit-backdrop-filter: var(--lg-filter-sm);
+  backdrop-filter: var(--lg-filter-sm);
+  box-shadow: var(--lg-highlight), var(--lg-shadow-sm);
+  margin: 0 0.3em 0.4em 0;
+  transition: background-color var(--lg-dur-fast) var(--lg-ease),
+              transform var(--lg-dur-fast) var(--lg-spring);
+}
+.mainDetailButtons .detailButton:hover,
+.mainDetailButtons .button-flat:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px) scale(1.05);
+}
+.mainDetailButtons .detailButton:active {
+  transform: scale(0.95);
+}
+/* Play / resume = filled accent capsule */
+.mainDetailButtons .btnPlay,
+.mainDetailButtons .btnResume,
+.mainDetailButtons .btnReplay {
+  background: rgba(255, 255, 255, 0.92);
+  color: #000;
+  border-color: rgba(255, 255, 255, 0.9);
+}
+.mainDetailButtons .btnPlay:hover,
+.mainDetailButtons .btnResume:hover,
+.mainDetailButtons .btnReplay:hover {
+  background: #fff;
+}
+.mainDetailButtons .btnPlay .detailButton-icon,
+.mainDetailButtons .btnResume .detailButton-icon,
+.mainDetailButtons .btnReplay .detailButton-icon {
+  color: #000;
+}
+.detailButton-content {
+  padding: 0.1em;
+}
+
+/* Selectors (version / audio / subtitle) */
+.trackSelections .selectContainer .emby-select-withcolor,
+.trackSelections .emby-select {
+  border-radius: var(--lg-radius-sm);
+}
+
+/* Overview & tags */
+.overview-text,
+.overview {
+  color: rgba(255, 255, 255, 0.86);
+  line-height: 1.55;
+}
+.itemGenres a,
+.itemTags a,
+.itemExternalLinks a,
+.itemDetailsGroup .button-link {
+  color: var(--lg-text);
+}
+
+/* Episodes / list items */
+.listItem {
+  border-radius: var(--lg-radius-sm);
+  transition: background-color var(--lg-dur-fast) var(--lg-ease);
+}
+.listItem:hover,
+.listItem:focus {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+.listItemImage {
+  border-radius: var(--lg-radius-sm);
+  overflow: hidden;
+}
+.listItem-border {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Collapsible sections (Seasons, Cast, Extras…) */
+.detailVerticalSection .sectionTitle {
+  margin-bottom: 0.6em;
+}
+
+/* --------------------------------------------------------------------------
+   8. Dialogs, action sheets & context menus (floating → full glass)
+   -------------------------------------------------------------------------- */
+.dialogBackdrop,
+.dialogBackdropOpened {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+.dialog {
+  border-radius: var(--lg-radius-lg);
+  border: var(--lg-border);
+  background: var(--lg-tint-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg);
+  color: var(--lg-text);
+  overflow: hidden;
+}
+.dialog.dialog-fullscreen,
+.dialog.dialog-fixedSize {
+  border-radius: var(--lg-radius-lg);
+}
+@media (max-width: 50em) {
+  .dialog.dialog-fullscreen-lowres {
+    border-radius: 0;
+  }
+}
+
+/* Spring-in for dialogs */
+.dialog.opened,
+.dialogContainer .dialog {
+  animation: lg-pop-in var(--lg-dur) var(--lg-spring) both;
+}
+@keyframes lg-pop-in {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.formDialogHeader,
+.formDialogFooter {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.formDialogHeader {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.formDialogFooter {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.formDialogFooterItem {
+  border-radius: var(--lg-radius-pill);
+}
+
+/* Action sheet / context menu */
+.actionSheet {
+  border-radius: var(--lg-radius-lg);
+  padding: 0.35em;
+  min-width: 14em;
+}
+.actionSheetContent {
+  padding: 0.2em 0;
+}
+.actionSheetMenuItem,
+.actionSheetMenuItem.listItem {
+  border-radius: var(--lg-radius-sm);
+  margin: 1px 0.25em;
+  min-height: 2.6em;
+  transition: background-color var(--lg-dur-fast) var(--lg-ease);
+}
+.actionSheetMenuItem:hover,
+.actionSheetMenuItem:focus {
+  background-color: var(--lg-tint-hover) !important;
+}
+.actionsheetDivider {
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.3em 0.6em;
+}
+.actionSheetTitle {
+  color: var(--lg-text-dim);
+}
+
+/* Generic popups / tooltips */
+.toast {
+  border-radius: var(--lg-radius-pill);
+  background: var(--lg-tint-strong);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  border: var(--lg-border);
+  box-shadow: var(--lg-glass-shadow);
+  color: var(--lg-text);
+  padding: 0.8em 1.4em;
+}
+.toastContainer {
+  z-index: var(--lg-z-toast);
+}
+
+/* Loading spinner accent */
+.mdl-spinner__circle {
+  border-color: var(--lg-accent-solid);
+}
+
+/* --------------------------------------------------------------------------
+   9. Login & settings pages
+   -------------------------------------------------------------------------- */
+.manualLoginForm,
+.loginPage .padded-left.padded-right.padded-bottom-page > form {
+  border-radius: var(--lg-radius-lg);
+}
+.loginPage .cardScalable {
+  border-radius: 50%;
+}
+
+.readOnlyContent .listItem,
+.paperList,
+.verticalSection-extrabottompadding .paperList {
+  border-radius: var(--lg-radius);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.collapseContent {
+  border-radius: var(--lg-radius-sm);
+}
+
+/* --------------------------------------------------------------------------
+   10. Modern (MUI / React) layout — Jellyfin 10.11+ app bar, drawer, menus
+       The legacy .skinHeader rules above cover the classic layout; these
+       cover the React app bar that newer servers render instead.
+   -------------------------------------------------------------------------- */
+header.MuiAppBar-root.MuiAppBar-positionFixed {
+  top: var(--lg-header-inset);
+  left: var(--lg-header-inset);
+  right: var(--lg-header-inset);
+  width: auto;
+  border-radius: var(--lg-radius-lg);
+  border: var(--lg-border);
+  background: var(--lg-tint) !important; /* overrides inline scroll tint */
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  box-shadow: var(--lg-glass-shadow);
+  overflow: hidden;
+  transition: background-color var(--lg-dur) var(--lg-ease),
+              transform var(--lg-dur) var(--lg-ease),
+              opacity var(--lg-dur) var(--lg-ease);
+}
+/* The app bar's in-flow spacer: add the inset + a little air so page
+   content (library toolbars, grids) clears the floating capsule */
+header.MuiAppBar-root.MuiAppBar-positionFixed + div {
+  margin-bottom: calc(var(--lg-header-inset) * 2 + 4px);
+}
+/* Empty app bar (video page) — hide the leftover 2px capsule */
+header.MuiAppBar-root.MuiAppBar-positionFixed:not(:has(.MuiToolbar-root)) {
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+header.MuiAppBar-root .MuiToolbar-root {
+  min-height: 52px;
+  padding-left: 0.6em;
+  padding-right: 0.6em;
+}
+
+/* Text/nav buttons in the app bar → pills */
+header.MuiAppBar-root .MuiButton-root {
+  border-radius: var(--lg-radius-pill);
+  padding-left: 0.95em;
+  padding-right: 0.95em;
+  text-transform: none;
+  font-weight: 500;
+  color: var(--lg-text-dim);
+  transition: background-color var(--lg-dur-fast) var(--lg-ease),
+              color var(--lg-dur-fast) var(--lg-ease),
+              transform var(--lg-dur-fast) var(--lg-spring);
+}
+header.MuiAppBar-root .MuiButton-root:hover {
+  color: var(--lg-text);
+  background-color: var(--lg-tint-hover);
+}
+header.MuiAppBar-root .MuiButton-root:active {
+  transform: scale(0.96);
+}
+/* Server name / logo link stays bright */
+header.MuiAppBar-root .MuiButton-sizeLarge {
+  color: var(--lg-text);
+  font-weight: 600;
+}
+header.MuiAppBar-root .MuiButton-root[aria-current="page"],
+header.MuiAppBar-root .MuiButton-root.active,
+header.MuiAppBar-root .MuiButton-root.Mui-selected {
+  color: var(--lg-text);
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: var(--lg-highlight-soft);
+}
+header.MuiAppBar-root .MuiIconButton-root {
+  transition: background-color var(--lg-dur-fast) var(--lg-ease),
+              transform var(--lg-dur-fast) var(--lg-spring);
+}
+header.MuiAppBar-root .MuiIconButton-root:hover {
+  background-color: var(--lg-tint-hover);
+}
+header.MuiAppBar-root .MuiIconButton-root:active {
+  transform: scale(0.92);
+}
+header.MuiAppBar-root .MuiAvatar-root {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+/* Fixed side drawer (dashboard / library nav) */
+.MuiDrawer-paper {
+  background: var(--lg-tint-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  border-right: var(--lg-border) !important;
+  box-shadow: var(--lg-highlight-soft), var(--lg-shadow);
+}
+.MuiDrawer-paperAnchorLeft.MuiDrawer-paperAnchorDockedLeft,
+.MuiDrawer-docked .MuiDrawer-paper {
+  top: calc(52px + var(--lg-header-inset) * 2);
+  left: var(--lg-header-inset);
+  bottom: var(--lg-header-inset);
+  height: auto;
+  border: var(--lg-border) !important;
+  border-radius: var(--lg-radius-lg);
+}
+.MuiDrawer-paper .MuiListItemButton-root {
+  margin: 1px 0.5em;
+  border-radius: var(--lg-radius-sm);
+}
+.MuiDrawer-paper .MuiListItemButton-root.Mui-selected {
+  background: var(--lg-accent-soft);
+  box-shadow: var(--lg-highlight-soft);
+}
+.MuiDrawer-paper .MuiListItemButton-root.Mui-selected .MuiListItemIcon-root {
+  color: var(--lg-accent-solid);
+}
+.MuiDrawer-paper .MuiDivider-root {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Menus, popovers, dialogs, tooltips */
+.MuiMenu-paper,
+.MuiPopover-paper,
+.MuiAutocomplete-paper {
+  border-radius: var(--lg-radius) !important;
+  border: var(--lg-border);
+  background: var(--lg-tint-strong) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg) !important;
+  animation: lg-pop-in var(--lg-dur) var(--lg-spring) both;
+}
+.MuiMenu-list {
+  padding: 0.35em;
+}
+.MuiMenuItem-root {
+  border-radius: var(--lg-radius-sm);
+  min-height: 2.5em;
+}
+.MuiMenuItem-root:hover,
+.MuiMenuItem-root.Mui-focusVisible {
+  background-color: var(--lg-tint-hover);
+}
+.MuiMenu-paper .MuiDivider-root {
+  border-color: rgba(255, 255, 255, 0.1);
+  margin: 0.3em 0.5em;
+}
+.MuiDialog-paper {
+  border-radius: var(--lg-radius-lg) !important;
+  border: var(--lg-border);
+  background: var(--lg-tint-strong) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg) !important;
+}
+.MuiBackdrop-root:not(.MuiBackdrop-invisible) {
+  background-color: rgba(0, 0, 0, 0.35);
+}
+.MuiTooltip-tooltip {
+  border-radius: var(--lg-radius-pill);
+  background: rgba(30, 30, 34, 0.78);
+  -webkit-backdrop-filter: var(--lg-filter-sm);
+  backdrop-filter: var(--lg-filter-sm);
+  border: var(--lg-border);
+  padding: 0.4em 0.9em;
+}
+.MuiOutlinedInput-root {
+  border-radius: var(--lg-radius-sm);
+}
+.MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+.MuiChip-root {
+  border-radius: var(--lg-radius-pill);
+  background: var(--lg-tint-light);
+  border: var(--lg-border);
+}

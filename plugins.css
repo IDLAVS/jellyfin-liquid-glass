@@ -1,0 +1,317 @@
+/* ==========================================================================
+   Liquid Glass — plugin integrations
+   Media Bar · Intro Skipper · In-Player Episode Preview ·
+   Jellyfin Enhanced · Moonfin
+   Plugins inject their own <style> tags; a few !important flags are needed
+   where those tags use !important themselves.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Media Bar (#slides-container)
+   -------------------------------------------------------------------------- */
+#slides-container .gradient-overlay {
+  background: linear-gradient(90deg,
+      rgba(7, 8, 11, 0.78) 0%,
+      rgba(7, 8, 11, 0.35) 45%,
+      rgba(7, 8, 11, 0) 70%),
+    linear-gradient(0deg,
+      var(--lg-bg) 0%,
+      rgba(7, 8, 11, 0) 35%) !important;
+}
+
+/* "TV Show" / "Movie" badge → glass pill */
+#slides-container .featured-content {
+  border-radius: var(--lg-radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  border: var(--lg-border);
+  -webkit-backdrop-filter: var(--lg-filter-sm);
+  backdrop-filter: var(--lg-filter-sm);
+  box-shadow: var(--lg-highlight-soft);
+  padding: 0.25em 0.9em;
+  width: auto;
+}
+
+#slides-container .plot {
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
+#slides-container .spec-line,
+#slides-container .spec-item {
+  color: var(--lg-text-dim);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+#slides-container .spec-cert {
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+}
+#slides-container .spec-rail {
+  border-radius: var(--lg-radius-pill);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.16);
+}
+#slides-container .spec-progress {
+  border-radius: var(--lg-radius-pill);
+  background: rgba(255, 255, 255, 0.9);
+}
+#slides-container .poster-container img,
+#slides-container .poster {
+  border-radius: var(--lg-radius);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), var(--lg-shadow-lg);
+}
+
+/* Play / Details / Favorite */
+#slides-container .button-container button {
+  border-radius: var(--lg-radius-pill) !important;
+  border: var(--lg-border) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  -webkit-backdrop-filter: var(--lg-filter-sm);
+  backdrop-filter: var(--lg-filter-sm);
+  box-shadow: var(--lg-highlight), var(--lg-shadow-sm) !important;
+  color: var(--lg-text) !important;
+  transition: background-color var(--lg-dur-fast) var(--lg-ease),
+              transform var(--lg-dur-fast) var(--lg-spring) !important;
+}
+#slides-container .button-container button:hover {
+  background: rgba(255, 255, 255, 0.24) !important;
+  transform: translateY(-1px) scale(1.04);
+}
+#slides-container .button-container button:active {
+  transform: scale(0.95);
+}
+#slides-container .button-container .play-button {
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #000 !important;
+}
+#slides-container .button-container .play-button:hover {
+  background: #fff !important;
+}
+#slides-container .button-container .play-button * {
+  color: #000 !important;
+}
+
+/* Arrows + chrome toggles (volume / pause / settings) */
+#slides-container .arrow,
+#slides-container .ss-chrome {
+  border-radius: 50% !important;
+  background: rgba(20, 20, 24, 0.38) !important;
+  border: var(--lg-border) !important;
+  -webkit-backdrop-filter: var(--lg-filter-sm);
+  backdrop-filter: var(--lg-filter-sm);
+  box-shadow: var(--lg-highlight-soft), var(--lg-shadow-sm) !important;
+  transition: background-color var(--lg-dur-fast) var(--lg-ease),
+              transform var(--lg-dur-fast) var(--lg-spring),
+              opacity var(--lg-dur) var(--lg-ease) !important;
+}
+#slides-container .arrow:hover,
+#slides-container .ss-chrome:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1.08);
+}
+
+/* Dots: keep the plugin's own pill indicator and its left alignment
+   (same gutter as the logo / Play button). Only cancel the first dot's
+   side margin so the dots line up exactly with the Play button's edge. */
+#slides-container .dots-container {
+  margin-left: -0.28rem;
+}
+
+/* --------------------------------------------------------------------------
+   2. Intro Skipper (legacy #skipIntro button + segment variants)
+   -------------------------------------------------------------------------- */
+#skipIntro,
+.skipIntro,
+div.skipIntro,
+#skipIntro .emby-button,
+.skipIntro .emby-button {
+  border-radius: var(--lg-radius-pill) !important;
+}
+#skipIntro .emby-button,
+.skipIntro .emby-button,
+.skipIntro > button,
+#skipIntro > button {
+  background: var(--lg-tint-osd) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  border: var(--lg-border-strong) !important;
+  box-shadow: var(--lg-glass-shadow) !important;
+  color: var(--lg-text) !important;
+  padding: 0.7em 1.4em !important;
+  font-weight: 600;
+  transition: transform var(--lg-dur-fast) var(--lg-spring),
+              background-color var(--lg-dur-fast) var(--lg-ease) !important;
+}
+#skipIntro .emby-button:hover,
+.skipIntro .emby-button:hover,
+.skipIntro > button:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  transform: scale(1.04);
+}
+/* Keep the button above the floating OSD capsule */
+#skipIntro,
+.skipIntro,
+.skip-button {
+  bottom: calc(7.5em + max(16px, env(safe-area-inset-bottom)));
+  z-index: calc(var(--lg-z-osd) + 1);
+}
+
+/* --------------------------------------------------------------------------
+   3. In-Player Episode Preview
+      The popup is a Jellyfin .dialog.actionSheet (already glass via core.css)
+      with .previewPopup; lift it above the floating OSD capsule.
+   -------------------------------------------------------------------------- */
+.dialog.previewPopup {
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 8.5em) !important;
+  right: 16px;
+  max-height: calc(100vh - 8.5em - 6em);
+  border-radius: var(--lg-radius-lg) !important;
+  transform-origin: bottom right;
+}
+.previewPopupTitle {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.previewPopupScroller {
+  max-height: min(60vh, calc(100vh - 8.5em - 10em));
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent !important;
+}
+.previewPopupScroller::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.22) !important;
+  border-radius: var(--lg-radius-pill) !important;
+}
+.previewListItem,
+.selectedListItem {
+  border-radius: var(--lg-radius-sm) !important;
+  transition: background-color var(--lg-dur-fast) var(--lg-ease);
+}
+.previewListItem:hover {
+  background-color: var(--lg-tint-hover) !important;
+}
+.selectedListItem {
+  background: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: var(--lg-highlight-soft);
+}
+.previewListItem img,
+.selectedListItem img,
+.previewListItem [class*="Image"],
+.selectedListItem [class*="Image"] {
+  border-radius: var(--lg-radius-xs) !important;
+}
+.previewQuickActionContainer .paper-icon-button-light:hover {
+  background-color: var(--lg-tint-hover);
+}
+
+/* --------------------------------------------------------------------------
+   4. Jellyfin Enhanced
+   -------------------------------------------------------------------------- */
+/* Header launcher panel (dialog) */
+dialog.je-launcher-panel,
+.je-launcher-panel {
+  border-radius: var(--lg-radius-lg) !important;
+  border: var(--lg-border) !important;
+  background: var(--lg-tint-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg) !important;
+  color: var(--lg-text);
+}
+/* Drop the panel below the floating header instead of over it */
+dialog.je-launcher-panel[open] {
+  top: calc(var(--lg-header-inset) * 2 + 56px) !important;
+  margin-top: 0 !important;
+  animation: lg-pop-in var(--lg-dur) var(--lg-spring) both;
+}
+.je-launcher-panel::backdrop {
+  background: rgba(0, 0, 0, 0.3);
+}
+.je-launcher-grid > *,
+.je-launcher-grid button,
+.je-launcher-grid a {
+  border-radius: var(--lg-radius) !important;
+}
+.je-launcher-close {
+  border-radius: 50% !important;
+}
+
+/* Header action buttons (dice / random, bookmarks, etc.) */
+.je-header-buttons-tray .headerButton,
+.je-header-actions-host .headerButton,
+#randomItemButton {
+  border-radius: 50% !important;
+}
+
+/* Settings panel, more-info modal, Seerr modals */
+.je-more-info-modal > div,
+.je-more-info-modal-content,
+.jellyseerr-season-modal > div,
+.jellyseerr-season-modal-content,
+#jellyfin-enhanced-panel,
+.jellyfin-enhanced-panel,
+#streaming-settings-modal > div {
+  border-radius: var(--lg-radius-lg) !important;
+  border: var(--lg-border) !important;
+  background: var(--lg-tint-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg) !important;
+}
+
+/* Seerr / discovery cards inherit card geometry */
+.jellyseerr-section .cardScalable,
+.jellyseerr-card .cardScalable {
+  border-radius: var(--lg-radius);
+}
+.jellyseerr-request-button,
+.jellyseerr-button {
+  border-radius: var(--lg-radius-pill) !important;
+}
+
+/* Pause screen */
+#pause-screen-overlay #pause-screen-close-btn {
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: var(--lg-border) !important;
+  -webkit-backdrop-filter: var(--lg-filter-sm);
+  backdrop-filter: var(--lg-filter-sm);
+}
+#pause-screen-progress-wrap {
+  border-radius: var(--lg-radius-pill);
+  overflow: hidden;
+}
+#pause-screen-progress-bar {
+  border-radius: var(--lg-radius-pill);
+}
+
+/* Toasts */
+.je-toast,
+.jellyfin-enhanced-toast {
+  border-radius: var(--lg-radius-pill) !important;
+  background: var(--lg-tint-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  border: var(--lg-border) !important;
+  box-shadow: var(--lg-glass-shadow) !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. Moonfin
+   -------------------------------------------------------------------------- */
+.headerMoonfinButton:hover {
+  background-color: var(--lg-tint-hover) !important;
+}
+.headerMoonfinButton:active {
+  transform: scale(0.92);
+}
+/* Moonfin panels/overlays opened from the header */
+.moonfin-panel,
+.moonfin-modal,
+.moonfin-dialog,
+[class^="moonfin-"][class*="overlay"] > div,
+#moonfin-root > div[role="dialog"] {
+  border-radius: var(--lg-radius-lg) !important;
+  border: var(--lg-border) !important;
+  background: var(--lg-tint-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter-strong);
+  backdrop-filter: var(--lg-filter-strong);
+  box-shadow: var(--lg-glass-shadow-lg) !important;
+}
