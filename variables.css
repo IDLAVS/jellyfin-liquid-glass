@@ -4,7 +4,7 @@
    jsDelivr:  https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/<file>
    ========================================================================== */
 :root {
-  --custom-bg-url: url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/blackandwhite3840x2160.jpg");
+  --custom-bg-url: url("https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/abstract-blur.jpg");
   --custom-bg-overlay-opacity: 0.45;  /* 0 = raw image, 1 = solid dark */
   --custom-bg-blur: 0px;              /* e.g. 12px for a frosted wallpaper */
 }

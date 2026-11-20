@@ -19,7 +19,7 @@ Save, then hard-reload the web client (Ctrl+Shift+R). This URL works once the re
 The wallpaper behind every page without movie/show fanart comes from `--custom-bg-url`. By default it loads from your `IDLAVS/jellyfin-assets` repo through jsDelivr:
 
 ```
-https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/blackandwhite3840x2160.jpg
+https://cdn.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/abstract-blur.jpg
 ```
 
 To use a different image, add **one line** under the `@import` in Custom CSS:
@@ -33,13 +33,13 @@ Any file in `jellyfin-assets` works with the same pattern: `https://cdn.jsdelivr
 
 | Variable | Default | What it controls |
 | --- | --- | --- |
-| `--custom-bg-url` | `blackandwhite3840x2160.jpg` via jsDelivr | The wallpaper image. |
+| `--custom-bg-url` | `abstract-blur.jpg` via jsDelivr | The wallpaper image. |
 | `--custom-bg-overlay-opacity` | `0.45` | Darkening over the wallpaper (0 = raw image, 1 = solid dark). |
 | `--custom-bg-blur` | `0px` | Frosted wallpaper, e.g. `12px`. Turned off automatically on TV/Xbox to save GPU. |
 
 The wallpaper cross-fades away whenever fanart is showing (movie/show pages, Media Bar page backdrops) and is never drawn behind the video player.
 
-jsDelivr caches `@main` for up to 12 hours. After replacing an image *with the same filename*, either wait or pin a commit (`@<commit-sha>` instead of `@main`).
+jsDelivr caches `@main` for up to 12 hours, so a newly added or replaced image can 404 or show the old version for a while. To refresh it immediately, open the same URL with `purge.jsdelivr.net` in place of `cdn.jsdelivr.net`, for example `https://purge.jsdelivr.net/gh/IDLAVS/jellyfin-assets@main/abstract-blur.jpg`.
 
 ## Local development
 
